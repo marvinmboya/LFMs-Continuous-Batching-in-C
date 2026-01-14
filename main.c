@@ -3,7 +3,8 @@
 // also can use <lfm.h>
 
 int main() {
-    BPE();
+    char *tok_path = "files/tokenizer.json";
+    BPE(tok_path);
     LFM();
     printf("Hello Main Program.\n");
 }
