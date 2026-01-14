@@ -1,5 +1,6 @@
-#include "model/lfm.h"
-#include "tokenizer/bpe.h"
+#include "lfm.h" 
+#include "bpe.h"
+// also can use <lfm.h>
 
 int main() {
     BPE();
