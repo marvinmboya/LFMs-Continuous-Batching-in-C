@@ -4,11 +4,13 @@ HDRS := $(wildcard *.h */*.h)
 SRCS := $(wildcard *.c */*.c)
 BIN  := build/main
 
+INCLUDES := -Imodel -Itokenizer
+
 run: ${BIN}
 	${BIN}
 
 ${BIN}: ${SRCS} ${HDRS}
-	gcc ${SRCS} -o ${BIN}
+	gcc ${INCLUDES} ${SRCS} -o ${BIN}
 
 clean:
 	rm ${BIN}
