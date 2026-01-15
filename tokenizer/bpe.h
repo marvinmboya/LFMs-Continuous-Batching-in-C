@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "uthash.h"
-#include "cJSON.h"
+#include "types.h"
 
 size_t get_file_size(FILE *f);
 static char *read_file(char *fname);

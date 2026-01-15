@@ -2,9 +2,6 @@
 
 void BPE(char *tok_path) {
     char *data = read_file(tok_path);
-    cJSON *root = cJSON_Parse(data);
-    CHECK_ERR(root, "json parse error!");
-    cJSON_Delete(root);
     free(data);
 }
 
