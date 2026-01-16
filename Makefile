@@ -6,7 +6,7 @@ SRCS := $(wildcard *.c */*.c */*/*.c)
 SRCS := $(filter-out tests/%.c, $(SRCS))
 BIN  := build/main
 
-INCLUDES := -Imodel -Itokenizer -Itokenizer/utils
+INCLUDES := -Imodel -Itokenizer
 
 run: ${BIN}
 	${BIN}
