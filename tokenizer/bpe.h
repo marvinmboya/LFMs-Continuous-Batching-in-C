@@ -9,12 +9,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "uthash.h"
+#include <string.h>
 #include "types.h"
 
-size_t get_file_size(FILE *f);
-static char *read_file(char *fname);
-
-void BPE(char *tok_path);
-
+int* encode(Tokenizer *tok, const char *text, int *out_len);
+char* decode(Tokenizer *tok, int *ids, int len);
+Tokenizer* init_tok_special_toks(char *tok_path);
 #endif
