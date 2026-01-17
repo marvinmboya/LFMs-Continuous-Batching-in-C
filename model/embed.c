@@ -1,7 +1,5 @@
 #include "embed.h"
 
-float bf16_to_float32(uint16_t b);
-
 static void *embed_map = NULL;
 static size_t embed_size = 0;
 
@@ -38,7 +36,7 @@ float* compute_embed(uint16_t *embed_data, int *seq, int seq_len, int d_model) {
             embed_out[block_index + j] = bf16_to_float32(slice[j]);
         }
     }
-    return embed_data;
+    return embed_out;
 }
 
 void free_embed() {
