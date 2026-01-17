@@ -5,6 +5,7 @@
 #include <unistd.h> // close(...)
 #include <sys/stat.h> // fstat(...)
 #include <sys/mman.h> // mmap(...)
+
 #define PERR(err) do { \
     perror(err); \
     exit(EXIT_FAILURE); \
@@ -19,7 +20,8 @@ float bf16_to_float32(uint16_t b) {
 int main() {
     const char* filename = "data.bin";
     int fd = open(filename, O_RDONLY);
-    size_t n = 6;
+    int n_vocab = 65536, d_model = 1024;
+    size_t n = n_vocab * d_model;
     if (fd == -1) PERR("Failed to open file"); 
 
     struct stat sb;
@@ -31,23 +33,30 @@ int main() {
     if (mapped == MAP_FAILED) PERR("error mapping file");
     uint16_t* data = (uint16_t*)mapped;
     
-    printf("Reading all elements\n");
-    for (int i=0; i<n; i++){
-        float val = bf16_to_float32(data[i]);
-        printf("index: %d val=%.4f\n", i, val);
-    }
-    int seq[] = {0, 0, 1, 0, 1};
-    int seq_len = 5, d_model = 3;
+    int seq[] = {32433, 13522, 14949, 25594, 35943};
+    int i = 0, j = 0, seq_len = 5;
     float val = 0.0f;
-    for (int i = 0; i < 5; i++){
+    size_t block_index; 
+    float *embed_out = malloc(seq_len * d_model * sizeof(float));
+    for (i = 0; i < seq_len; i++){
         uint16_t* slice = &data[seq[i] * d_model];
-        for (int j = 0; j < d_model; j++){
-            val = bf16_to_float32(slice[j]);
-            printf("%.4f, ", val);
+        block_index = i * d_model;
+        for (size_t j = 0; j < d_model; j++){
+            embed_out[block_index + j] = bf16_to_float32(slice[j]);
+        }
+    }
+    printf("EMBED OUT:\n");
+    for (i = 0; i < seq_len; i++){
+        for (j = 0; j < d_model; j++){
+            int idx = i * d_model + j;
+            if (idx >= i * d_model && idx < i * d_model + 5){
+                printf("%.4f, ", embed_out[idx]);
+            }
         }
         printf("\n");
     }
 
+    free(embed_out);
     munmap(mapped, sb.st_size);
     close(fd);
 
