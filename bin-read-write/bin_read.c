@@ -5,19 +5,19 @@
 #include <unistd.h> // close(...)
 #include <sys/stat.h> // fstat(...)
 #include <sys/mman.h> // mmap(...)
+#include <time.h>
+#include <omp.h>
 
 #define PERR(err) do { \
     perror(err); \
     exit(EXIT_FAILURE); \
 } while(0)
 
-float bf16_to_float32(uint16_t b) {
-    uint32_t bits = (uint32_t)b;
-    bits <<= 16;
-    return *((float*)&bits); 
-}
+float bf16_to_float32(uint16_t b);
+void get_threads_info();
 
-int main() {
+int main(int argc, char **argv) {
+    clock_t st = clock();
     const char* filename = "data.bin";
     int fd = open(filename, O_RDONLY);
     int n_vocab = 65536, d_model = 1024;
@@ -38,9 +38,13 @@ int main() {
     float val = 0.0f;
     size_t block_index; 
     float *embed_out = malloc(seq_len * d_model * sizeof(float));
+
+    omp_set_num_threads(8);
+    get_threads_info();
     for (i = 0; i < seq_len; i++){
         uint16_t* slice = &data[seq[i] * d_model];
         block_index = i * d_model;
+        #pragma omp parallel for
         for (j = 0; j < d_model; j++){
             embed_out[block_index + j] = bf16_to_float32(slice[j]);
         }
@@ -59,6 +63,22 @@ int main() {
     free(embed_out);
     munmap(mapped, sb.st_size);
     close(fd);
-
+    clock_t en = clock();
+    printf("time taken: %.8f seconds\n", (double)(en - st) / CLOCKS_PER_SEC);
     return 0;
+}
+
+float bf16_to_float32(uint16_t b) {
+    uint32_t bits = (uint32_t)b;
+    bits <<= 16;
+    return *((float*)&bits); 
+}
+
+void get_threads_info() {
+    #pragma omp parallel 
+    {
+        int active_threads = omp_get_num_threads();
+        int max_threads = omp_get_max_threads();
+        printf("active: %d max: %d threads\n", active_threads, max_threads);
+    }
 }
