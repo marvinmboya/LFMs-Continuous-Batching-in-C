@@ -41,7 +41,7 @@ int main() {
     for (i = 0; i < seq_len; i++){
         uint16_t* slice = &data[seq[i] * d_model];
         block_index = i * d_model;
-        for (size_t j = 0; j < d_model; j++){
+        for (j = 0; j < d_model; j++){
             embed_out[block_index + j] = bf16_to_float32(slice[j]);
         }
     }
