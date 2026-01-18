@@ -45,3 +45,15 @@ uint16_t *read_bin_data(const char *data_path, size_t n){
     fclose(f);
     return udata;
 }
+
+float *convert_bin_data_float(uint16_t *udata, size_t n){
+    float *fdata = malloc(n * sizeof(float));
+    if (!fdata) PERR("fdata mem error!");
+    omp_set_num_threads(get_suff_threads());
+    #pragma omp parallel for
+    for (int i = 0; i < n; i++){
+        fdata[i] = bf16_to_float32(udata[i]);
+    }
+    free(udata);
+    return fdata;
+}
