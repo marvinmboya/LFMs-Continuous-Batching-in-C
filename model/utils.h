@@ -16,4 +16,5 @@ void get_threads_info();
 size_t get_file_size(FILE *f);
 size_t get_file_size_v2(FILE *f);
 uint16_t *read_bin_data(const char *data_path, size_t n);
+float *convert_bin_data_float(uint16_t *udata, size_t n);
 #endif
