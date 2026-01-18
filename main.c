@@ -28,9 +28,10 @@ int main() {
     int d_model = config.d_model;
     float *embed_out = compute_embed(embeds, seq, seq_len, d_model);
         printf("EMBED OUT:\n");
+    int idx = 0;
     for (int i = 0; i < seq_len; i++){
         for (int j = 0; j < d_model; j++){
-            int idx = i * d_model + j;
+            idx = i * d_model + j;
             if (idx >= i * d_model && idx < i * d_model + 5){
                 printf("%.4f, ", embed_out[idx]);
             }
