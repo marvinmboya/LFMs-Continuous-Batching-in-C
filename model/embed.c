@@ -27,7 +27,6 @@ float* compute_embed(uint16_t *embed_data, int *seq, int seq_len, int d_model) {
     float val = 0.0f;
     size_t block_index; 
 
-    omp_set_num_threads(8);
     for (int i = 0; i < seq_len; i++){
         uint16_t* slice = &embed_data[seq[i] * d_model];
         block_index = i * d_model;
