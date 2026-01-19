@@ -56,3 +56,9 @@ float *convert_bin_data_float(uint16_t *udata, size_t n){
     free(udata);
     return fdata;
 }
+
+float* load_data(const char *data_path, size_t n) {
+        uint16_t *udata = read_bin_data(data_path, n);
+        float *fdata = convert_bin_data_float(udata, n);
+        return fdata;
+}
