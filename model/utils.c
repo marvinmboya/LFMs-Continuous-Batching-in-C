@@ -62,3 +62,16 @@ float* load_data(const char *data_path, size_t n) {
         float *fdata = convert_bin_data_float(udata, n);
         return fdata;
 }
+
+void debug_print_first_five(float *embed_out, int seq_len, int d_model) {
+    int idx = 0;
+    for (int i = 0; i < seq_len; i++){
+        for (int j = 0; j < d_model; j++){
+            idx = i * d_model + j;
+            if (idx >= i * d_model && idx < i * d_model + 5){
+                printf("%.4f, ", embed_out[idx]);
+            }
+        }
+        printf("\n");
+    }
+}
