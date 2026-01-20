@@ -3,6 +3,10 @@
 #include "bpe.h"
 #include "model/types.h"
 #include "model/embed.h"
+#include "model/rmsnorm.h"
+#include "model/utils.h"
+
+void test_encode_decode(Tokenizer *tok);
 
 int main() {
     LFM2Config config = {
@@ -11,36 +15,48 @@ int main() {
     };
     char *tok_path = "files/tokenizer.bin";
     char *embed_path = "files/embed_data.bin";
+    omp_set_num_threads(get_suff_threads());
 
     Tokenizer *tok = init_tok_special_toks(tok_path);
     uint16_t *embeds = init_embed(embed_path, &config);
+    test_encode_decode(tok);
 
-    const char *text = "<|startoftext|>Hello world! And again!\n<|im_start|>What's the new image?<|im_end|>assistant";
+    int seq[] = {32433, 13522, 14949, 25594, 35943};
+    int seq_len = sizeof(seq) / sizeof(seq[0]);
+    int d_model = config.d_model;
+    float *embed_out = compute_embed(embeds, seq, seq_len, d_model);
+    printf("EMBED OUT:\n");
+    debug_print_first_five(embed_out, seq_len, d_model);
+    int batch = 1;
+    seq_len = 4; d_model = 6;
+    int n = batch * seq_len * d_model;
+    char buf[20];
+    sprintf(buf, "b_%d_data.bin", batch);
+
+    float *data = load_data(buf, n);
+    for (int i = 0; i < n; i++){
+        printf("%.4f, ", data[i]);
+    }
+    printf("\n");
+    float weights[] = { 1.3525,  0.6863, -0.3278,  0.7950,  0.2815,  0.0562};
+    compute_rms_norm(data, weights, n, d_model);
+    for (int i = 0; i < n; i++){
+        printf("%.4f, ", data[i]);
+    }
+    printf("\n");
+    free(data);
+    free(embed_out);
+    free_embed();
+    return 0;
+}
+
+void test_encode_decode(Tokenizer *tok){
+    const char *text = "Hello world!";
     int len;
     int *tokens = encode(tok, text, &len);
     for (int i = 0; i < len; i++) printf("%d ", tokens[i]);
     printf("\n");
     char *decoded = decode(tok, tokens, len);
     printf("%s\n", decoded);
-
-    int seq[] = {32433, 13522, 14949, 25594, 35943};
-    int seq_len = sizeof(seq) / sizeof(seq[0]);
-    int d_model = config.d_model;
-    float *embed_out = compute_embed(embeds, seq, seq_len, d_model);
-        printf("EMBED OUT:\n");
-    int idx = 0;
-    for (int i = 0; i < seq_len; i++){
-        for (int j = 0; j < d_model; j++){
-            idx = i * d_model + j;
-            if (idx >= i * d_model && idx < i * d_model + 5){
-                printf("%.4f, ", embed_out[idx]);
-            }
-        }
-        printf("\n");
-    }
-
-    free(embed_out);
-    free_embed();
     free(decoded); free(tokens);
-    return 0;
 }
