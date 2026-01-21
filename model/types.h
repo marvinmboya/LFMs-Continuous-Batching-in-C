@@ -7,6 +7,9 @@ typedef struct {
     int d_model;
     int n_layers;
     int context_len;
+    int heads;
+    int head_dim;
+    int kv_groups;
 } LFM2Config;
 
 #endif
