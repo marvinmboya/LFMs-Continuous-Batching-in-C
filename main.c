@@ -52,9 +52,15 @@ int main() {
                 (config.d_model * kv_d_out) * 2;
     Weights_Meta qkv_meta;
     load_map_data("wqkv_weights.bin", &qkv_meta, n);
-    free(data); data=NULL; data = load_data("./test_weights/x_in_to_qkv.bin", seq_len * d_model);
+    free(data); data=NULL; 
     seq_len = 5;
-    gqattention(data, &config, qkv_meta.fdata, batch, seq_len);
+    data = load_data("./test_weights/x_in_to_qkv.bin", 5 * 1024);
+    Weights_Meta qnorm_meta, knorm_meta;
+    load_map_data("q_norm_weights.bin", &qnorm_meta, config.head_dim);
+    load_map_data("k_norm_weights.bin", &knorm_meta, config.head_dim);
+    gqattention(data, &config, qkv_meta.fdata, qnorm_meta.fdata, knorm_meta.fdata, batch, seq_len);
+    munmap(qnorm_meta.fdata, qnorm_meta.size);
+    munmap(knorm_meta.fdata, knorm_meta.size);
     munmap(qkv_meta.fdata, qkv_meta.size);
     free(data);
     free(embed_out);
