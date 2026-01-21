@@ -2,7 +2,10 @@
 
 static float *compute_qkv_outs(float *x_in, const float *assoc_weights, int BATCH, int seq_len, int d_model, int d_out);
 
-void gqattention(float *x_in, LFM2Config *config, float *qkv_weights, int BATCH, int seq_len) {
+void gqattention(
+    float *x_in, LFM2Config *config, float *qkv_weights, 
+    float *q_norm, float *k_norm, int BATCH, int seq_len
+) {
     int d_model = config->d_model,
         heads = config->heads,
         head_dim = config->head_dim,
@@ -27,6 +30,8 @@ void gqattention(float *x_in, LFM2Config *config, float *qkv_weights, int BATCH,
     transpose_middle(BATCH, seq_len, kv_groups, head_dim, v, v_trans);
     free(q); free(k); free(v);
     q = q_trans; k = k_trans; v = v_trans;
+    compute_rms_norm(q, q_norm, seq_len * d_out, head_dim);
+    compute_rms_norm(k, k_norm, seq_len * kv_d_out, head_dim);
     free(q); free(k); free(v);
 }
 
