@@ -19,12 +19,12 @@ void gqattention(float *x_in, LFM2Config *config, float *qkv_weights, int BATCH,
     float *q = compute_qkv_outs(x_in, q_weights, BATCH, seq_len, d_model, d_out);
     float *k = compute_qkv_outs(x_in, k_weights, BATCH, seq_len, d_model, kv_d_out);
     float *v = compute_qkv_outs(x_in, v_weights, BATCH, seq_len, d_model, kv_d_out);
-    float *q_trans = malloc(q_size * sizeof(float));
-    float *k_trans = malloc(k_size * sizeof(float));
-    float *v_trans = malloc(v_size * sizeof(float));
-    transpose_middle(BATCH, heads, seq_len, head_dim, q, q_trans);
-    transpose_middle(BATCH, kv_groups, seq_len, head_dim, k, k_trans);
-    transpose_middle(BATCH, kv_groups, seq_len, head_dim, v, v_trans);
+    float *q_trans = malloc(seq_len * d_out * sizeof(float));
+    float *k_trans = malloc(seq_len * kv_d_out * sizeof(float));
+    float *v_trans = malloc(seq_len * kv_d_out * sizeof(float));
+    transpose_middle(BATCH, seq_len, heads, head_dim, q, q_trans);
+    transpose_middle(BATCH, seq_len, kv_groups, head_dim, k, k_trans);
+    transpose_middle(BATCH, seq_len, kv_groups, head_dim, v, v_trans);
     free(q); free(k); free(v);
     q = q_trans; k = k_trans; v = v_trans;
     free(q); free(k); free(v);
