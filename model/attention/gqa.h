@@ -2,6 +2,7 @@
 #define GQA_H
 #include "linear.h"
 #include "utils.h"
+#include "../types.h"
 
-void gqattention(float *x_in, float *qkv_weights, int group_size);
+void gqattention(float *x_in, LFM2Config *config, float *qkv_weights, int BATCH, int seq_len);
 #endif
