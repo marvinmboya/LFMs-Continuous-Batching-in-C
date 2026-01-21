@@ -2,7 +2,7 @@
 
 void transpose_middle(
     int BATCH, int heads, int seq_len, int head_dim, 
-    int *old, int *new) {
+    float *old, float *new) {
     int C = heads, H = seq_len, W = head_dim;
     #pragma omp parallel for collapse(2)
     for (int n = 0; n < BATCH; n++) {

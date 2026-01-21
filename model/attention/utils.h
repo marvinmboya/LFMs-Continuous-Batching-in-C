@@ -3,6 +3,6 @@
 
 void transpose_middle(
     int BATCH, int heads, int seq_len, int head_dim, 
-    int *old, int *new);
+    float *old, float *new);
 
 #endif
