@@ -1,8 +1,7 @@
 # make <RG_NAME>=<ARG_VALUE>
 
-HDRS := $(wildcard *.h */*.h)
-
 COMPILER := clang
+HDRS := $(wildcard *.h */*.h */*/*.h)
 SRCS := $(wildcard *.c */*.c */*/*.c)
 SRCS := $(filter-out tests/%.c, $(SRCS))
 FLAGS := -fopenmp
