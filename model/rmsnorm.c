@@ -1,5 +1,9 @@
 #include "rmsnorm.h"
 
+static void compute_vars(float *data, float *vars, size_t n, int d_model);
+static void compute_rsqrt(float *data, float *vars, int n_vars, size_t n, int d_model);
+static void compute_norm_out(float *data, float *weights, size_t n, int d_model);
+
 void compute_rms_norm(float *data, float *weights, size_t n, int d_model) {
     int n_vars = (int)(n / d_model);
     float vars[n_vars];
@@ -8,7 +12,7 @@ void compute_rms_norm(float *data, float *weights, size_t n, int d_model) {
     compute_norm_out(data, weights, n, d_model);
 }
 
-void compute_vars(float *data, float *vars, size_t n, int d_model) {
+static void compute_vars(float *data, float *vars, size_t n, int d_model) {
     #pragma omp parallel for schedule(static, 1)
     for (int i = 0; i < n; i += d_model) {
         float sum = 0.0f;
@@ -20,7 +24,7 @@ void compute_vars(float *data, float *vars, size_t n, int d_model) {
     }
 }
 
-void compute_rsqrt(float *data, float *vars, int n_vars, size_t n, int d_model) {
+static void compute_rsqrt(float *data, float *vars, int n_vars, size_t n, int d_model) {
     float var_eps = 1e-5;
     for (int i = 0; i < n_vars; i++) {
         vars[i] = 1. / sqrt(vars[i] + var_eps);
@@ -33,7 +37,7 @@ void compute_rsqrt(float *data, float *vars, int n_vars, size_t n, int d_model) 
     }
 }
 
-void compute_norm_out(float *data, float *weights, size_t n, int d_model) {
+static void compute_norm_out(float *data, float *weights, size_t n, int d_model) {
     #pragma omp parallel for schedule(static)
     for (int i = 0; i < n / d_model; i++) {
         int base = i * d_model;
