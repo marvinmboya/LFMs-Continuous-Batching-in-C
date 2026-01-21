@@ -52,7 +52,8 @@ int main() {
                 (config.d_model * kv_d_out) * 2;
     Weights_Meta qkv_meta;
     load_map_data("wqkv_weights.bin", &qkv_meta, n);
-    printf("n: %d first: %.7f last: %.7f\n", n, qkv_meta.fdata[0], qkv_meta.fdata[n - 1]);
+    free(data); data=NULL; data = load_data("./test_weights/x_in_to_qkv.bin", seq_len * d_model);
+    seq_len = 5;
     gqattention(data, &config, qkv_meta.fdata, batch, seq_len);
     munmap(qkv_meta.fdata, qkv_meta.size);
     free(data);
