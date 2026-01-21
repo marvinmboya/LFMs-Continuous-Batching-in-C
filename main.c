@@ -5,6 +5,8 @@
 #include "model/embed.h"
 #include "model/rmsnorm.h"
 #include "model/utils.h"
+#include "model/attention/utils.h"
+#include "model/attention/gqa.h"
 
 void test_encode_decode(Tokenizer *tok);
 
@@ -12,6 +14,7 @@ int main() {
     LFM2Config config = {
         .n_vocab = 65536, .d_model = 1024, 
         .context_len = 32000, .n_layers = 16, 
+        .heads = 16, .head_dim = 64, .kv_groups = 8
     };
     char *tok_path = "files/tokenizer.bin";
     char *embed_path = "files/embed_data.bin";
@@ -32,7 +35,6 @@ int main() {
     int n = batch * seq_len * d_model;
     char buf[20];
     sprintf(buf, "b_%d_data.bin", batch);
-
     float *data = load_data(buf, n);
     for (int i = 0; i < n; i++){
         printf("%.4f, ", data[i]);
@@ -44,6 +46,15 @@ int main() {
         printf("%.4f, ", data[i]);
     }
     printf("\n");
+    int d_out = config.heads * config.head_dim;
+    int kv_d_out = config.kv_groups * config.head_dim;
+    n = (config.d_model * d_out) +
+                (config.d_model * kv_d_out) * 2;
+    Weights_Meta qkv_meta;
+    load_map_data("wqkv_weights.bin", &qkv_meta, n);
+    printf("n: %d first: %.7f last: %.7f\n", n, qkv_meta.fdata[0], qkv_meta.fdata[n - 1]);
+    gqattention(data, &config, qkv_meta.fdata, batch, seq_len);
+    munmap(qkv_meta.fdata, qkv_meta.size);
     free(data);
     free(embed_out);
     free_embed();
