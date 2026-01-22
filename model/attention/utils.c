@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <stdio.h>
 
 void transpose_middle(
     int BATCH, int seq_len, int heads, int head_dim, 
@@ -15,6 +16,22 @@ void transpose_middle(
                     new[dst_base + w] = old[src_base + w];
                 }
             }
+        }
+    }
+}
+
+void repeat_interleave(
+    const float *in, size_t n, float *out, int block_size, int repeats) {
+    const float *src = in;
+    float *dst = out;
+    int total_blocks = (int)n / block_size;
+    #pragma omp parallel for schedule(static)
+    for (int i = 0; i < total_blocks; i++) {
+        const float *block = src + (size_t)i * block_size;
+        float *out_base = dst + (size_t)i * repeats * block_size;
+        for (int r = 0; r < repeats; ++r) {
+            memcpy(out_base + (size_t)r * block_size,
+            block, block_size * sizeof(float));
         }
     }
 }
