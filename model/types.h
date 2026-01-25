@@ -10,6 +10,7 @@ typedef struct {
     int heads;
     int head_dim;
     int kv_groups;
+    int k_size;
 } LFM2Config;
 
 #endif
