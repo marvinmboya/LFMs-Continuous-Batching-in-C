@@ -32,7 +32,18 @@ void gqattention(
     q = q_trans; k = k_trans; v = v_trans;
     compute_rms_norm(q, q_norm, seq_len * d_out, head_dim);
     compute_rms_norm(k, k_norm, seq_len * kv_d_out, head_dim);
-    free(q); free(k); free(v);
+    int kv_size = BATCH * seq_len * kv_groups * head_dim;
+    float *k_expand = malloc(kv_size * group_size * sizeof(float));
+    float *v_expand = malloc(kv_size * group_size * sizeof(float));
+    repeat_interleave(k, kv_size, k_expand, seq_len * head_dim, group_size);
+    repeat_interleave(v, kv_size, v_expand, seq_len * head_dim, group_size);
+    free(k); free(v);
+    float *out = sdpattention(
+    q, k_expand, v_expand, head_dim,
+    BATCH, seq_len, heads, head_dim);
+    free(out);
+    free(k_expand); free(v_expand);
+    free(q);
 }
 
 static float *compute_qkv_outs(float *x_in, const float *assoc_weights, int BATCH, int seq_len, int d_model, int d_out) {
