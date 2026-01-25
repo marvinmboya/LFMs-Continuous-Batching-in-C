@@ -20,7 +20,7 @@ void transpose_middle(
     }
 }
 
-void transpose_last(
+void transpose_last_higher(
     int BATCH, int seq_len, int heads, int head_dim,
     const float *old, float *new)
 {
@@ -34,6 +34,25 @@ void transpose_last(
                     int dst = n*(C*W*H) + c*(W*H) + w*(H) + h;
                     new[dst] = old[src];
                 }
+            }
+        }
+    }
+}
+
+void transpose_last(
+    int BATCH, int seq_len, int dims,
+    const float *old, float *new)
+{
+    int C = seq_len;
+    int W = dims;
+
+    #pragma omp parallel for collapse(2)
+    for (int n = 0; n < BATCH; n++) {
+        for (int c = 0; c < C; c++) {
+            for (int w = 0; w < W; w++) {
+                int src = n*(C*W) + c*(W) + w;
+                int dst = n*(W*C) + w*(C) + c;
+                new[dst] = old[src];
             }
         }
     }
