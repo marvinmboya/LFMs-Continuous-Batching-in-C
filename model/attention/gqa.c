@@ -1,10 +1,13 @@
 #include "gqa.h"
 
-static float *compute_qkv_outs(float *x_in, const float *assoc_weights, int BATCH, int seq_len, int d_model, int d_out);
+void compute_qkvo(
+    float *x_in, float *x_out, const float *assoc_weights, 
+    int BATCH, int seq_len, int d_model, int d_out
+);
 
 void gqattention(
-    float *x_in, LFM2Config *config, float *qkv_weights, float *wo_weight,
-    float *q_norm, float *k_norm, int BATCH, int seq_len
+    float *x_in, float *x_out, LFM2Config *config, 
+    GQAWeights *gqa_weights, int BATCH, int seq_len
 ) {
     int d_model = config->d_model,
         heads = config->heads,
@@ -16,12 +19,15 @@ void gqattention(
         q_size = config->d_model * d_out,
         k_size = config->d_model * kv_d_out,
         v_size = k_size;
-    float *q_weights = qkv_weights;
-    float *k_weights = qkv_weights + q_size;
-    float *v_weights = qkv_weights + q_size + k_size;
-    float *q = compute_qkv_outs(x_in, q_weights, BATCH, seq_len, d_model, d_out);
-    float *k = compute_qkv_outs(x_in, k_weights, BATCH, seq_len, d_model, kv_d_out);
-    float *v = compute_qkv_outs(x_in, v_weights, BATCH, seq_len, d_model, kv_d_out);
+    float *q_weights = gqa_weights->wqkv;
+    float *k_weights = gqa_weights->wqkv + q_size;
+    float *v_weights = gqa_weights->wqkv + q_size + k_size;
+    float *q = malloc(BATCH * seq_len * d_out * sizeof(float));
+    float *k = malloc(BATCH * seq_len * kv_d_out * sizeof(float));
+    float *v = malloc(BATCH * seq_len * kv_d_out * sizeof(float));
+    compute_qkvo(x_in, q, q_weights, BATCH, seq_len, d_model, d_out);
+    compute_qkvo(x_in, k, k_weights, BATCH, seq_len, d_model, kv_d_out);
+    compute_qkvo(x_in, v, v_weights, BATCH, seq_len, d_model, kv_d_out);
     float *q_t = malloc(seq_len * d_out * sizeof(float));
     float *k_t = malloc(seq_len * kv_d_out * sizeof(float));
     float *v_t = malloc(seq_len * kv_d_out * sizeof(float));
@@ -30,8 +36,8 @@ void gqattention(
     transpose_middle(BATCH, seq_len, kv_groups, head_dim, v, v_t);
     free(q); free(k); free(v);
     q = q_t; k = k_t; v = v_t;
-    compute_rms_norm(q, q_norm, seq_len * d_out, head_dim);
-    compute_rms_norm(k, k_norm, seq_len * kv_d_out, head_dim);
+    compute_rms_norm(q, gqa_weights->q_norm, seq_len * d_out, head_dim);
+    compute_rms_norm(k, gqa_weights->k_norm, seq_len * kv_d_out, head_dim);
     int kv_size = BATCH * seq_len * kv_groups * head_dim;
     float *k_expand = malloc(kv_size * group_size * sizeof(float));
     float *v_expand = malloc(kv_size * group_size * sizeof(float));
@@ -44,15 +50,15 @@ void gqattention(
     float *out_t = malloc(kv_size * group_size * sizeof(float));
     transpose_middle(BATCH, heads, seq_len, head_dim, out, out_t);
     free(out);
-    float *gqa_out = compute_qkv_outs(out_t, wo_weight, BATCH, seq_len, d_model, d_out);
+    compute_qkvo(out_t, x_out, gqa_weights->wo, BATCH, seq_len, d_model, d_out);
     free(out_t);
-    free(gqa_out);
     free(k_expand); free(v_expand);
     free(q);
 }
 
-static float *compute_qkv_outs(float *x_in, const float *assoc_weights, int BATCH, int seq_len, int d_model, int d_out) {
-    float *x_out = malloc(BATCH * seq_len * d_out * sizeof(float));
+void compute_qkvo(
+    float *x_in, float *x_out, const float *assoc_weights, 
+    int BATCH, int seq_len, int d_model, int d_out
+) {
     matmul(x_in, assoc_weights, x_out, BATCH, seq_len, d_model, d_out);
-    return x_out;
 }
