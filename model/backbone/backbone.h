@@ -6,4 +6,8 @@
 #include "../types.h"
 #include "../rmsnorm.h"
 
+void backbone(
+    float *x, float *x_out, LFM2Config *config, Weights *weights,
+    int batch, int seq_len, int d_model, int k_size, int layer_idx
+);
 #endif
