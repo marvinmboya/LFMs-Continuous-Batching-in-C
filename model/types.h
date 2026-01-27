@@ -1,5 +1,6 @@
 #ifndef MODEL_TYPES
 #define MODEL_TYPES
+#include <stdint.h>
 
 typedef struct {
     int n_vocab;
