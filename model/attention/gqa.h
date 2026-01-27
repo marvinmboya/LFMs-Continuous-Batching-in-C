@@ -7,7 +7,6 @@
 #include "utils.h"
 
 void gqattention(
-    float *x_in, LFM2Config *config, float *qkv_weights, 
-    float *q_norm, float *k_norm, int BATCH, int seq_len);
+    float *x_in, float *x_out, LFM2Config *config, GQAWeights *gqa_weights, int BATCH, int seq_len);
 
 #endif
