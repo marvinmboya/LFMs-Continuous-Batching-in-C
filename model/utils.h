@@ -7,17 +7,12 @@
 #include <sys/mman.h> // mmap(...)
 #include <fcntl.h> // open(...)
 #include <unistd.h> // close(...)
+#include "types.h"
 
 #define PERR(err) do { \
     perror(err); \
     exit(EXIT_FAILURE); \
 } while(0)
-
-typedef struct {
-    uint16_t *udata;
-    float *fdata;
-    size_t size;
-} Weights_Meta;
 
 float bf16_to_float32(uint16_t b);
 int get_suff_threads();
@@ -31,4 +26,5 @@ void read_bin_map_data(const char *weights_path, Weights_Meta *meta, size_t n);
 void convert_bin_map_float(Weights_Meta *meta, size_t n);
 void load_map_data(const char *weights_path, Weights_Meta *meta, size_t n);
 void debug_print_first_five(float *embed_out, int seq_len, int d_model);
+void max_elements(float *array, size_t N);
 #endif
