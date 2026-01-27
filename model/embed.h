@@ -10,5 +10,5 @@
 #include "types.h"
 #include "utils.h"
 
-float* compute_embed(float *embed_data, int *seq, int seq_len, int d_model);
+void compute_embeds(float *embed_data, float *embeds_out, int *seq, int seq_len, int d_model);
 #endif

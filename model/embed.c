@@ -3,8 +3,7 @@
 static void *embed_map = NULL;
 static size_t embed_size = 0;
 
-float* compute_embed(float *embed_data, int *seq, int seq_len, int d_model) {
-    float *embed_out = malloc(seq_len * d_model * sizeof(float));
+void compute_embeds(float *embed_data, float *embeds_out, int *seq, int seq_len, int d_model) {
     float val = 0.0f;
     size_t block_index;
 
@@ -13,8 +12,7 @@ float* compute_embed(float *embed_data, int *seq, int seq_len, int d_model) {
         block_index = i * d_model;
         #pragma omp parallel for
         for (int j = 0; j < d_model; j++){
-            embed_out[block_index + j] = slice[j];
+            embeds_out[block_index + j] = slice[j];
         }
     }
-    return embed_out;
 }
