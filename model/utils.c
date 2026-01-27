@@ -93,8 +93,8 @@ float* load_data(const char *data_path, size_t n) {
 }
 
 void load_map_data(const char *weights_path, Weights_Meta *meta, size_t n) {
-        read_bin_map_data(weights_path, meta, n);
-        convert_bin_map_float(meta, n);
+    read_bin_map_data(weights_path, meta, n);
+    convert_bin_map_float(meta, n);
 }
 
 void debug_print_first_five(float *embed_out, int seq_len, int d_model) {
@@ -108,4 +108,16 @@ void debug_print_first_five(float *embed_out, int seq_len, int d_model) {
         }
         printf("\n");
     }
+}
+
+void max_elements(float *array, size_t N) {
+    float max_value = array[0];
+    int max_index = 0;
+    for (int i = 1; i < N; ++i) {
+        if (array[i] > max_value ) {
+            max_index = i;
+            max_value = array[i];
+        }
+    }
+    printf("INDEX: %d VAL: %f\n", max_index, max_value);
 }
