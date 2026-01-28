@@ -154,6 +154,6 @@ void destroy_weights(Weights *model_weights){
 }
 
 char *get_path(char *wname, char *full_path){
-    sprintf(full_path, "files/weights/%s", wname);
+    sprintf(full_path, "files/fp32_bins/%s", wname);
     return full_path;
 }
