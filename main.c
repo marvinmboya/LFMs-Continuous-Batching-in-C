@@ -7,64 +7,38 @@
 #include "model/utils.h"
 #include "model/attention/utils.h"
 #include "model/attention/gqa.h"
+#include "model/gsc.h"
+#include "model/init_weights.h"
+#include <time.h>
 
 void test_encode_decode(Tokenizer *tok);
 
 int main() {
     LFM2Config config = {
-        .n_vocab = 65536, .d_model = 1024, 
-        .context_len = 32000, .n_layers = 16, 
-        .heads = 16, .head_dim = 64, .kv_groups = 8
+        .n_vocab = 65536, .d_model = 1024, .d_hidden = 4608,
+        .context_len = 32000, .n_layers = 16, .heads = 16, 
+        .head_dim = 64, .kv_groups = 8, .k_size = 3
     };
+    Weights model_weights;
     char *tok_path = "files/tokenizer.bin";
     char *embed_path = "files/embed_data.bin";
     omp_set_num_threads(get_suff_threads());
+    create_weights(&config, &model_weights);
 
-    Tokenizer *tok = init_tok_special_toks(tok_path);
-    uint16_t *embeds = init_embed(embed_path, &config);
-    test_encode_decode(tok);
-
-    int seq[] = {32433, 13522, 14949, 25594, 35943};
-    int seq_len = sizeof(seq) / sizeof(seq[0]);
-    int d_model = config.d_model;
-    float *embed_out = compute_embed(embeds, seq, seq_len, d_model);
-    printf("EMBED OUT:\n");
-    debug_print_first_five(embed_out, seq_len, d_model);
     int batch = 1;
-    seq_len = 4; d_model = 6;
-    int n = batch * seq_len * d_model;
-    char buf[20];
-    sprintf(buf, "b_%d_data.bin", batch);
-    float *data = load_data(buf, n);
-    for (int i = 0; i < n; i++){
-        printf("%.4f, ", data[i]);
-    }
-    printf("\n");
-    float weights[] = { 1.3525,  0.6863, -0.3278,  0.7950,  0.2815,  0.0562};
-    compute_rms_norm(data, weights, n, d_model);
-    for (int i = 0; i < n; i++){
-        printf("%.4f, ", data[i]);
-    }
-    printf("\n");
-    int d_out = config.heads * config.head_dim;
-    int kv_d_out = config.kv_groups * config.head_dim;
-    n = (config.d_model * d_out) +
-                (config.d_model * kv_d_out) * 2;
-    Weights_Meta qkv_meta;
-    load_map_data("wqkv_weights.bin", &qkv_meta, n);
-    free(data); data=NULL; 
-    seq_len = 5;
-    data = load_data("./test_weights/x_in_to_qkv.bin", 5 * 1024);
-    Weights_Meta qnorm_meta, knorm_meta;
-    load_map_data("q_norm_weights.bin", &qnorm_meta, config.head_dim);
-    load_map_data("k_norm_weights.bin", &knorm_meta, config.head_dim);
-    gqattention(data, &config, qkv_meta.fdata, qnorm_meta.fdata, knorm_meta.fdata, batch, seq_len);
-    munmap(qnorm_meta.fdata, qnorm_meta.size);
-    munmap(knorm_meta.fdata, knorm_meta.size);
-    munmap(qkv_meta.fdata, qkv_meta.size);
-    free(data);
-    free(embed_out);
-    free_embed();
+    Tokenizer *tok = init_tok_special_toks(tok_path);
+    // const char *text = "Hello world!";
+    const char *text = "<|startoftext|><|im_start|>user\nHello world!<|im_end|>\n<|im_start|>assistant\n";
+    int seq_len;
+    int *token_ids = encode(tok, text, &seq_len);
+    printf("START\n");
+    clock_t st = clock();
+    LFM2Model(token_ids, seq_len, &config, &model_weights, batch);
+    clock_t end = clock();
+    printf("time spent: %.7f\n", (double)(end - st) / CLOCKS_PER_SEC);
+    destroy_weights(&model_weights);
+    free(token_ids);
+    free(tok);
     return 0;
 }
 
