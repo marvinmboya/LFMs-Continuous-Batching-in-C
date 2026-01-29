@@ -3,9 +3,10 @@
 #include <stdlib.h> // size_t
 #include "linear.h"
 #include "utils.h"
+#include "../utils.h"
 
-float *sdpattention(
-    float *q, float *k, float *v, float scale,
+void sdpattention(
+    float *q, float *k, float *v, float *out, float scale,
     int BATCH, int seq_len, int heads, int head_dim
 );
 void softmax_last(
