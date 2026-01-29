@@ -73,3 +73,17 @@ void repeat_interleave(
         }
     }
 }
+
+void elementwise_mul(float *a, const float *b, int n) {
+    #pragma omp parallel for simd
+    for (int i = 0; i < n; i++) {
+        a[i] *= b[i];
+    }
+}
+
+void elementwise_add(float *a, const float *b, int n) {
+    #pragma omp parallel for simd
+    for (int i = 0; i < n; i++) {
+        a[i] += b[i];
+    }
+}

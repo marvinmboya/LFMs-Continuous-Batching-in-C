@@ -18,4 +18,9 @@ void repeat_interleave(
     const float *in, size_t n, 
     float *out, int block_size, int repeats
 );
+
+void elementwise_mul( // in-place
+    float *a, const float *b, int n);
+void elementwise_add( // in-place
+    float *a, const float *b, int n);
 #endif
