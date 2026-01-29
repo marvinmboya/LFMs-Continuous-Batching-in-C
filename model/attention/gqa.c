@@ -44,8 +44,9 @@ void gqattention(
     repeat_interleave(k, kv_size, k_expand, seq_len * head_dim, group_size);
     repeat_interleave(v, kv_size, v_expand, seq_len * head_dim, group_size);
     free(k); free(v);
-    float *out = sdpattention(
-    q, k_expand, v_expand, head_dim,
+    float *out = malloc(BATCH*heads*seq_len*head_dim * sizeof(float));
+    sdpattention(
+    q, k_expand, v_expand, out, head_dim,
     BATCH, seq_len, heads, head_dim);
     float *out_t = malloc(kv_size * group_size * sizeof(float));
     transpose_middle(BATCH, heads, seq_len, head_dim, out, out_t);
