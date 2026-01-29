@@ -24,7 +24,5 @@ void backbone(
         batch * seq_len * d_model, d_model);
     feedforward(x, x_out, weights->ffw1[layer_index], weights->ffv[layer_index], 
         weights->ffw2[layer_index], batch, seq_len, d_model, config->d_hidden);
-    max_elements(x_out, batch * seq_len * d_model);
     elementwise_add(x_out, shortcut, batch * seq_len * d_model);
-    max_elements(x_out, batch * seq_len * d_model);
 }
