@@ -7,9 +7,6 @@
 #include "types.h"
 #include <math.h>
 
-// in-place
-void elementwise_mul(
-    float *a, const float *b, int n);
 int get_conv_out_size(
     int in_size, int k_size, int p_size, int stride);
 void depthwise_conv1d(

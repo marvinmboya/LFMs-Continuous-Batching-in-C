@@ -43,13 +43,6 @@ static void compute_w_outs(
     matmul(x_in, weights, x_out, BATCH, seq_len, d_model, d_out);
 }
 
-void elementwise_mul(float *a, const float *b, int n) {
-    #pragma omp parallel for simd
-    for (int i = 0; i < n; i++) {
-        a[i] *= b[i];
-    }
-}
-
 int get_conv_out_size(int in_size, int k_size, int p_size, int stride){
     p_size = 2 * p_size;
     int _part = (int)floor((in_size + p_size - k_size)/stride);
