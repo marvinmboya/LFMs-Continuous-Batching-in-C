@@ -5,6 +5,7 @@
 #include "../gsc.h"
 #include "../types.h"
 #include "../rmsnorm.h"
+#include "feedforward.h"
 
 void backbone(
     float *x, float *x_out, LFM2Config *config, Weights *weights,
