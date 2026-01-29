@@ -7,12 +7,16 @@ void LFM2Model(
     float *embeds_out = malloc(batch * seq_len * config->d_model * sizeof(float));
     compute_embeds(weights->embeds, embeds_out, token_ids, seq_len, config->d_model);
     float *x_out = malloc(batch * seq_len * config->d_model * sizeof(float));
+    float *in = embeds_out;
+    float *out = x_out;
     for (int i = 0; i < 16; i++) {
         backbone(
-            embeds_out, x_out, config, weights, 
+            in, out, config, weights, 
             batch, seq_len, config->d_model, config->k_size, i
         );
-        embeds_out = x_out;
+        float *tmp = in;
+        in = out;
+        out = tmp; 
     }
     compute_rms_norm(x_out, weights->rms_out,
         batch * seq_len * config->d_model, config->d_model);
