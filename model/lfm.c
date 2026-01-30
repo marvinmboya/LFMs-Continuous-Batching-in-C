@@ -1,28 +1,23 @@
 #include "lfm.h"
+#include <time.h>
 
 void LFM2Model(
-    int *token_ids, int seq_len, 
-    LFM2Config *config, Weights *weights, int batch
+    Weights *weights, Buf *buf, LFM2Config *config, 
+    int *token_ids, int seq_len, int batch
 ) {
-    float *embeds_out = malloc(batch * seq_len * config->d_model * sizeof(float));
-    compute_embeds(weights->embeds, embeds_out, token_ids, seq_len, config->d_model);
-    float *x_out = malloc(batch * seq_len * config->d_model * sizeof(float));
-    float *in = embeds_out;
-    float *out = x_out;
+    compute_embeds(weights->embeds, buf->embeds_out, token_ids, seq_len, config->d_model);
+    float *in = buf->embeds_out;
+    float *out = buf->x_out;
     for (int i = 0; i < 16; i++) {
         backbone(
-            in, out, config, weights, 
+            in, config, weights, buf,
             batch, seq_len, config->d_model, config->k_size, i
         );
-        float *tmp = in;
-        in = out;
-        out = tmp; 
+        max_elements(out, batch * seq_len * config->d_model);
+        in = out; 
     }
-    compute_rms_norm(x_out, weights->rms_out,
+    compute_rms_norm(out, weights->rms_out,
         batch * seq_len * config->d_model, config->d_model);
-    float *final_out = malloc(batch * seq_len * config->n_vocab * sizeof(float));
-    matmul(x_out, weights->lin_out, final_out, batch, seq_len, config->d_model, config->n_vocab);
+    matmul(out, weights->lin_out, buf->final_out, batch, seq_len, config->d_model, config->n_vocab);
     printf("Hello LFM Model.\n");
-    free(x_out);
-    free(embeds_out);
 }
