@@ -58,4 +58,25 @@ typedef struct {
     GSCWeights *gsc; 
     GQAWeights *gqa;
 } Weights;
+
+typedef struct {
+    float *q;
+    float *k;
+    float *v;
+    float *scores;
+    float *attn_out;
+    float *B;
+    float *C;
+    float *x;
+    float *BCx;
+    float *BCx_t;
+    float *conv_out;
+    float *conv_out_sliced;
+    float *conv_out_t;
+    float *embeds_out;
+    float *x_out;
+    float *out_w1;
+    float *out_v;
+    float *final_out;
+} Buf;
 #endif
