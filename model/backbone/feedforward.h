@@ -5,10 +5,11 @@
 #include "utils.h"
 #include "../attention/utils.h"
 #include "../attention/linear.h"
+#include "../types.h"
 
 void feedforward(
-    float *x_in, float *x_out, const float *w1, const float *v, 
-    const float *w2, int batch, int seq_len, int d_model, int d_hidden
+    float *x_in, float *x_out, const float *w1, const float *v, const float *w2, 
+    Buf *buf, int batch, int seq_len, int d_model, int d_hidden
 );
 void silu(float *x, size_t n);
 #endif
