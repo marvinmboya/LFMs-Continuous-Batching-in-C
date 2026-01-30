@@ -21,10 +21,16 @@ void create_model_buffers(Buf *buf, LFM2Config *config, int batch, int seq_len){
     init_malloc(&(buf->q), batch * seq_len * d_out);
     init_malloc(&(buf->k), batch * seq_len * kv_d_out);
     init_malloc(&(buf->v), batch * seq_len * kv_d_out);
+    init_malloc(&(buf->k_expand), batch * seq_len * d_out);
+    init_malloc(&(buf->v_expand), batch * seq_len * d_out);
+    init_malloc(&(buf->q_t), batch * seq_len * d_out);
+    init_malloc(&(buf->k_t), batch * seq_len * kv_d_out);
+    init_malloc(&(buf->v_t), batch * seq_len * kv_d_out);
 
     init_malloc(&(buf->scores), batch * heads * seq_len * seq_len);
     init_malloc(&(buf->norm_scores), batch * heads * seq_len * seq_len);
     init_malloc(&(buf->attn_out), batch * seq_len * d_model);
+    init_malloc(&(buf->attn_out_t), batch * seq_len * d_model);
     // GSC
     init_malloc(&(buf->BCx), batch * seq_len * d_model * 3);
     init_malloc(&(buf->BCx_t), batch * seq_len * d_model * 3);
@@ -53,10 +59,16 @@ void destroy_model_buffers(Buf *buf){
     destroy_malloc(buf->q);
     destroy_malloc(buf->k);
     destroy_malloc(buf->v);
+    destroy_malloc(buf->k_expand);
+    destroy_malloc(buf->v_expand);
+    destroy_malloc(buf->q_t);
+    destroy_malloc(buf->k_t);
+    destroy_malloc(buf->v_t);
 
     destroy_malloc(buf->scores);
     destroy_malloc(buf->norm_scores);
     destroy_malloc(buf->attn_out);
+    destroy_malloc(buf->attn_out_t);
     // GSC
     destroy_malloc(buf->BCx);
     destroy_malloc(buf->BCx_t);
