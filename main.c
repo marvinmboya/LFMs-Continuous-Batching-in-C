@@ -9,7 +9,7 @@
 #include "model/attention/gqa.h"
 #include "model/gsc.h"
 #include "model/init_weights.h"
-#include <time.h>
+#include "model/init_buffers.h"
 
 void test_encode_decode(Tokenizer *tok);
 
@@ -20,6 +20,8 @@ int main() {
         .head_dim = 64, .kv_groups = 8, .k_size = 3
     };
     Weights model_weights;
+    Buf model_buffers;
+
     char *tok_path = "files/tokenizer.bin";
     char *embed_path = "files/embed_data.bin";
     omp_set_num_threads(get_suff_threads());
@@ -31,11 +33,8 @@ int main() {
     const char *text = "<|startoftext|><|im_start|>user\nHello world!<|im_end|>\n<|im_start|>assistant\n";
     int seq_len;
     int *token_ids = encode(tok, text, &seq_len);
-    printf("START\n");
-    clock_t st = clock();
-    LFM2Model(token_ids, seq_len, &config, &model_weights, batch);
-    clock_t end = clock();
-    printf("time spent: %.7f\n", (double)(end - st) / CLOCKS_PER_SEC);
+    create_model_buffers(&model_buffers, &config, batch, seq_len);
+    LFM2Model(&model_weights, &model_buffers, &config, token_ids, seq_len, batch);
     destroy_weights(&model_weights);
     free(token_ids);
     free(tok);
