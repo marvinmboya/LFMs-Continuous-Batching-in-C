@@ -18,7 +18,8 @@ float* input, float* output, int channels,
 int seq_len_in, int seq_len_out);
 
 void gscblock(
-    float *x_in, float *x_out, GSCWeights *gsc_weights, int BATCH, int seq_len, int d_model, int k_size
+    float *x_in, GSCWeights *gsc_weights, 
+    Buf *buffers, int BATCH, int seq_len, int d_model, int k_size
 );
 
 #endif

@@ -6,34 +6,23 @@ static void compute_w_outs(
 );
 
 void gscblock(
-    float *x_in, float *x_out, GSCWeights *gsc_w, 
+    float *x_in, GSCWeights *gsc_w, Buf *buf,
     int BATCH, int seq_len, int d_model, int k_size
 ){
-    float *BCx = malloc(BATCH * seq_len * d_model * 3 * sizeof(float));
-    compute_w_outs(x_in, BCx, gsc_w->w1, BATCH, seq_len, d_model, d_model * 3);
-    float *BCx_t = malloc(BATCH * seq_len * d_model * 3 * sizeof(float));
-    transpose_last(BATCH, seq_len, d_model * 3, BCx, BCx_t);
+    compute_w_outs(x_in, buf->BCx, gsc_w->w1, BATCH, seq_len, d_model, d_model * 3);
+    transpose_last(BATCH, seq_len, d_model * 3, buf->BCx, buf->BCx_t );
     size_t sz = BATCH * seq_len * d_model, fsz = sz * sizeof(float);
-    float *B = malloc(fsz), *C = malloc(fsz), *x = malloc(fsz);
-    memcpy(B, BCx_t, fsz);
-    memcpy(C, BCx_t + sz, fsz);
-    memcpy(x, BCx_t + (sz * 2), fsz);
-    elementwise_mul(B, x, sz);
-    float *Bx = B;
+    memcpy(buf->B, buf->BCx_t, fsz);
+    memcpy(buf->C, buf->BCx_t + sz, fsz);
+    memcpy(buf->x, buf->BCx_t + (sz * 2), fsz);
+    elementwise_mul(buf->B, buf->x, sz);
+    float *Bx = buf->B;
     int co_sz = get_conv_out_size(seq_len, k_size, k_size - 1, 1);
-    float *conv_out = malloc(BATCH * d_model * co_sz * sizeof(float));
-    depthwise_conv1d(Bx, gsc_w->conv, conv_out, d_model, seq_len, co_sz, k_size, k_size - 1);
-    float *conv_out_sliced = malloc(BATCH * d_model * seq_len * sizeof(float));
-    slice_conv_out(conv_out, conv_out_sliced, d_model, co_sz, seq_len);
-    elementwise_mul(conv_out_sliced, C, BATCH * d_model * seq_len);
-    float *conv_out_t = malloc(BATCH * d_model * seq_len * sizeof(float));
-    transpose_last(BATCH, d_model, seq_len, conv_out_sliced, conv_out_t);
-    compute_w_outs(conv_out_t, x_out, gsc_w->w2, BATCH, seq_len, d_model, d_model);
-    free(conv_out);
-    free(conv_out_sliced);
-    free(Bx); free(C); free(x);
-    free(BCx);
-    free(BCx_t);
+    depthwise_conv1d(Bx, gsc_w->conv, buf->conv_out, d_model, seq_len, co_sz, k_size, k_size - 1);
+    slice_conv_out(buf->conv_out, buf->conv_out_sliced, d_model, co_sz, seq_len);
+    elementwise_mul(buf->conv_out_sliced, buf->C, BATCH * d_model * seq_len);
+    transpose_last(BATCH, d_model, seq_len, buf->conv_out_sliced, buf->conv_out_t);
+    compute_w_outs(buf->conv_out_t, buf->x_out, gsc_w->w2, BATCH, seq_len, d_model, d_model);
 }
 
 static void compute_w_outs(

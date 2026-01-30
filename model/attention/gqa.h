@@ -5,8 +5,9 @@
 #include "../rmsnorm.h"
 #include "../types.h"
 #include "utils.h"
+#include <float.h>
 
 void gqattention(
-    float *x_in, float *x_out, LFM2Config *config, GQAWeights *gqa_weights, int BATCH, int seq_len);
-
+    float *x_in, LFM2Config *config, GQAWeights *gqa_weights, Buf *buffers, int BATCH, int seq_len
+);
 #endif
