@@ -64,6 +64,7 @@ typedef struct {
     float *k;
     float *v;
     float *scores;
+    float *norm_scores;
     float *attn_out;
     float *B;
     float *C;
