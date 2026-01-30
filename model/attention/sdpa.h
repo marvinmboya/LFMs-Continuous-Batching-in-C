@@ -6,7 +6,7 @@
 #include "../utils.h"
 
 void sdpattention(
-    float *q, float *k, float *v, float *out, float scale,
+    float *q, float *k, float *v, Buf *buf, float scale,
     int BATCH, int seq_len, int heads, int head_dim
 );
 void softmax_last(

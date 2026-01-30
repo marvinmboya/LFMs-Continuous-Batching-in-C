@@ -23,6 +23,7 @@ void create_model_buffers(Buf *buf, LFM2Config *config, int batch, int seq_len){
     init_malloc(&(buf->v), batch * seq_len * kv_d_out);
 
     init_malloc(&(buf->scores), batch * heads * seq_len * seq_len);
+    init_malloc(&(buf->norm_scores), batch * heads * seq_len * seq_len);
     init_malloc(&(buf->attn_out), batch * seq_len * d_model);
     // GSC
     init_malloc(&(buf->BCx), batch * seq_len * d_model * 3);
@@ -54,6 +55,7 @@ void destroy_model_buffers(Buf *buf){
     destroy_malloc(buf->v);
 
     destroy_malloc(buf->scores);
+    destroy_malloc(buf->norm_scores);
     destroy_malloc(buf->attn_out);
     // GSC
     destroy_malloc(buf->BCx);
