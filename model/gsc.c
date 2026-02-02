@@ -9,7 +9,7 @@ void gscblock(
     float *x_in, GSCWeights *gsc_w, Buf *buf,
     int BATCH, int seq_len, int d_model, int k_size
 ){
-    compute_w_outs(x_in, buf->BCx, gsc_w->w1, BATCH, seq_len, d_model, d_model * 3);
+    matmul(x_in, gsc_w->w1, buf->BCx, BATCH, seq_len, d_model, d_model * 3);
     transpose_last(BATCH, seq_len, d_model * 3, buf->BCx, buf->BCx_t );
     size_t sz = BATCH * seq_len * d_model, fsz = sz * sizeof(float);
     memcpy(buf->B, buf->BCx_t, fsz);
@@ -22,14 +22,7 @@ void gscblock(
     slice_conv_out(buf->conv_out, buf->conv_out_sliced, d_model, co_sz, seq_len);
     elementwise_mul(buf->conv_out_sliced, buf->C, BATCH * d_model * seq_len);
     transpose_last(BATCH, d_model, seq_len, buf->conv_out_sliced, buf->conv_out_t);
-    compute_w_outs(buf->conv_out_t, buf->x_out, gsc_w->w2, BATCH, seq_len, d_model, d_model);
-}
-
-static void compute_w_outs(
-    float *x_in, float *x_out, const float *weights, 
-    int BATCH, int seq_len, int d_model, int d_out
-) {
-    matmul(x_in, weights, x_out, BATCH, seq_len, d_model, d_out);
+    matmul(buf->conv_out_t, gsc_w->w2, buf->x_out, BATCH, seq_len, d_model, d_model);
 }
 
 int get_conv_out_size(int in_size, int k_size, int p_size, int stride){
