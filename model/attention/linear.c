@@ -1,5 +1,6 @@
 #include "linear.h"
 
+#if !defined(__arm__) && !defined(__aarch64__)
 void matmul(
     const float *x_in,  // B*M*K
     const float *weights,  // K*N
@@ -28,6 +29,7 @@ void matmul(
         }
     }
 }
+#endif
 
 void matmul_higher(
     const float *A,   // [B, H, M, K]
