@@ -1,10 +1,5 @@
 #include "gsc.h"
 
-static void compute_w_outs(
-    float *x_in, float *x_out, const float *weights, 
-    int BATCH, int seq_len, int d_model, int d_out
-);
-
 void gscblock(
     float *x_in, GSCWeights *gsc_w, Buf *buf,
     int BATCH, int seq_len, int d_model, int k_size
