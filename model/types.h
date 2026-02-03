@@ -1,6 +1,7 @@
 #ifndef MODEL_TYPES
 #define MODEL_TYPES
 #include <stdint.h>
+#include <stdlib.h>
 
 typedef struct {
     int n_vocab;
@@ -85,5 +86,6 @@ typedef struct {
     float *out_w1;
     float *out_v;
     float *final_out;
+    float *logits;
 } Buf;
 #endif
