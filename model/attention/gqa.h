@@ -5,6 +5,8 @@
 #include "../rmsnorm.h"
 #include "../types.h"
 #include "utils.h"
+#include "../rope.h"
+
 #include <float.h>
 
 void gqattention(

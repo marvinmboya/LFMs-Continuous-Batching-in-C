@@ -26,6 +26,7 @@ void gqattention(
     transpose_middle(BATCH, seq_len, kv_groups, head_dim, buf->v, buf->v_t);
     compute_rms_norm(buf->q_t, gqa_weights->q_norm, seq_len * d_out, head_dim);
     compute_rms_norm(buf->k_t, gqa_weights->k_norm, seq_len * kv_d_out, head_dim);
+    apply_rope(buf->q_t, buf->k_t, buf->cos, buf->sin, seq_len, heads, kv_groups, head_dim);
     int kv_size = BATCH * seq_len * kv_groups * head_dim;
     repeat_interleave(buf->k_t, kv_size, buf->k_expand, seq_len * head_dim, group_size);
     repeat_interleave(buf->v_t, kv_size, buf->v_expand, seq_len * head_dim, group_size);
