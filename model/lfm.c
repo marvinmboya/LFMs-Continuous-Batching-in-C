@@ -18,5 +18,4 @@ void LFM2Model(
     compute_rms_norm(out, weights->rms_out,
         batch * seq_len * config->d_model, config->d_model);
     matmul(out, weights->lin_out, buf->final_out, batch, seq_len, config->d_model, config->n_vocab);
-    printf("Hello LFM Model.\n");
 }
