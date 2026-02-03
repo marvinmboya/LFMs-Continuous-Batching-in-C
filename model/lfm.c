@@ -13,7 +13,6 @@ void LFM2Model(
             in, config, weights, buf,
             batch, seq_len, config->d_model, config->k_size, i
         );
-        max_elements(out, batch * seq_len * config->d_model);
         in = out; 
     }
     compute_rms_norm(out, weights->rms_out,
