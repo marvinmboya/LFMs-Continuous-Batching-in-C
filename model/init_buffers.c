@@ -49,6 +49,7 @@ void create_model_buffers(Buf *buf, LFM2Config *config, int batch, int seq_len){
     init_malloc(&(buf->out_w1), batch * seq_len * config->d_hidden);
     init_malloc(&(buf->out_v), batch * seq_len * config->d_hidden);
     init_malloc(&(buf->final_out), batch * seq_len * config->n_vocab);
+    init_malloc(&(buf->logits), batch * config->n_vocab);
 }
 
 static void destroy_malloc(float *buf) {
@@ -85,6 +86,7 @@ void destroy_model_buffers(Buf *buf){
     destroy_malloc(buf->out_w1);
     destroy_malloc(buf->out_v);
     destroy_malloc(buf->final_out);
+    destroy_malloc(buf->logits);
 }
 
 int _get_conv_out_size(int in_size, int k_size, int p_size, int stride){
