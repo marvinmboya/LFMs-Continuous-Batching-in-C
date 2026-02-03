@@ -13,6 +13,7 @@ typedef struct {
     int head_dim;
     int kv_groups;
     int k_size;
+    float theta_base;
 } LFM2Config;
 
 typedef struct {
@@ -61,6 +62,8 @@ typedef struct {
 } Weights;
 
 typedef struct {
+    float *cos;
+    float *sin;
     float *q;
     float *k;
     float *v;
