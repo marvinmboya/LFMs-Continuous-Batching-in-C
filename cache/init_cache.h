@@ -1,7 +1,9 @@
 #ifndef CACHE_H
 #define CACHE_H
 #include <stdlib.h>
-#include "../types.h"
+#include <string.h>
+#include "../model/types.h"
+#include "../model/utils.h"
 
 typedef struct {
     float *conv_state;
@@ -9,5 +11,6 @@ typedef struct {
     float *v_cache;
 } CBuf;
 
+void create_cache_buffers(CBuf *bufs, LFM2Config config, int batch);
 int get_seq_len();
 #endif
