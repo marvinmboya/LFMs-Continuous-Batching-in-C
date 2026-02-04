@@ -18,8 +18,8 @@ void create_model_buffers(Buf *buf, LFM2Config *config, int batch, int seq_len){
         k_size = config->d_model * kv_d_out,
         v_size = k_size;
     // FREQS
-    init_malloc(&(buf->cos), config->context_len * config->head_dim / 2);
-    init_malloc(&(buf->sin), config->context_len * config->head_dim / 2);
+    init_malloc(&(buf->cos), config->max_seq_len * config->head_dim / 2);
+    init_malloc(&(buf->sin), config->max_seq_len * config->head_dim / 2);
     // GQA
     init_malloc(&(buf->q), batch * seq_len * d_out);
     init_malloc(&(buf->k), batch * seq_len * kv_d_out);
