@@ -8,7 +8,7 @@ typedef struct {
     int d_model;
     int d_hidden;
     int n_layers;
-    int context_len;
+    int max_seq_len;
     int heads;
     int head_dim;
     int kv_groups;
