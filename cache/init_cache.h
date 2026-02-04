@@ -12,5 +12,6 @@ typedef struct {
 } CBuf;
 
 void create_cache_buffers(CBuf *bufs, LFM2Config config, int batch);
+void destroy_cache_buffers(CBuf *bufs);
 int get_seq_len();
 #endif
