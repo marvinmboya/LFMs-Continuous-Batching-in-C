@@ -6,6 +6,5 @@
 #include "../utils.h"
 
 void sdpattention(Buf *buf, int BATCH, int seq_len, int heads, int head_dim);
-void softmax_last(
-    const float *in, float *out, int B, int H, int S, int HD);
+void softmax_last(const float *in, float *out, int B, int H, int S, int HD);
 #endif
