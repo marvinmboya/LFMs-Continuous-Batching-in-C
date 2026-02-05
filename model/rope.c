@@ -19,12 +19,12 @@ void compute_rope(
 
 void apply_rope(
     float *q, float *k, const float *cos, const float *sin,
-    int seq_len, int num_q_heads, int num_kv_heads, int head_dim
+    int seq_len, int decode_start, int num_q_heads, int num_kv_heads, int head_dim
 ) {
     int half_dim = head_dim / 2;
-
+    int decode_end = decode_start + seq_len;
     /* Apply RoPE to Q */
-    for (int s = 0; s < seq_len; s++) {
+    for (int s = decode_start; s < decode_end; s++) {
         const float *cos_row = cos + s * half_dim;
         const float *sin_row = sin + s * half_dim;
 
@@ -44,7 +44,7 @@ void apply_rope(
     }
 
     /* Apply RoPE to K */
-    for (int s = 0; s < seq_len; s++) {
+    for (int s = decode_start; s < decode_end; s++) {
         const float *cos_row = cos + s * half_dim;
         const float *sin_row = sin + s * half_dim;
 
