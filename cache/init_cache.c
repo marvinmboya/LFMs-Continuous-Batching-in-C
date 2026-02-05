@@ -33,9 +33,9 @@ void destroy_cache_buffers(CBuf *buf) {
 
 void update_cache(
     CBuf *bufs, LFM2Config *config, const float *k, 
-    const float *v, int seq_len, int decode_start, int i
+    const float *v, int batch, int seq_len, int decode_start, int i
 ) {
-    size_t sz = seq_len * config->kv_groups * config->head_dim;
+    size_t sz = batch * seq_len * config->kv_groups * config->head_dim;
     int offset = decode_start * sz;
     memcpy(bufs->k_cache[i] + offset, k, sz * sizeof(float));
     memcpy(bufs->v_cache[i] + offset, v, sz * sizeof(float));
