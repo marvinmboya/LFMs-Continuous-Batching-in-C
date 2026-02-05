@@ -24,14 +24,14 @@ void create_model_buffers(Buf *buf, LFM2Config *config, int batch, int seq_len){
     init_malloc(&(buf->q), batch * seq_len * d_out);
     init_malloc(&(buf->k), batch * seq_len * kv_d_out);
     init_malloc(&(buf->v), batch * seq_len * kv_d_out);
-    init_malloc(&(buf->k_expand), batch * seq_len * d_out);
-    init_malloc(&(buf->v_expand), batch * seq_len * d_out);
+    init_malloc(&(buf->k_expand), batch * config->max_seq_len * d_out);
+    init_malloc(&(buf->v_expand), batch * config->max_seq_len * d_out);
     init_malloc(&(buf->q_t), batch * seq_len * d_out);
     init_malloc(&(buf->k_t), batch * seq_len * kv_d_out);
     init_malloc(&(buf->v_t), batch * seq_len * kv_d_out);
 
-    init_malloc(&(buf->scores), batch * heads * seq_len * seq_len);
-    init_malloc(&(buf->norm_scores), batch * heads * seq_len * seq_len);
+    init_malloc(&(buf->scores), batch * heads * config->max_seq_len * config->max_seq_len);
+    init_malloc(&(buf->norm_scores), batch * heads * config->max_seq_len * config->max_seq_len);
     init_malloc(&(buf->attn_out), batch * seq_len * d_model);
     init_malloc(&(buf->attn_out_t), batch * seq_len * d_model);
     // GSC
