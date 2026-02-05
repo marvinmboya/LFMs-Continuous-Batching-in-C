@@ -8,7 +8,7 @@
 #include "feedforward.h"
 
 void backbone(
-    float *x, LFM2Config *config, Weights *weights, Buf *buffers,
-    int batch, int seq_len, int d_model, int k_size, int layer_idx
+    float *x, LFM2Config *config, Weights *weights, Buf *buf, CBuf *cache_buf,
+    int batch, int seq_len, int decode_start, int d_model, int k_size, int layer_idx
 );
 #endif
