@@ -1,9 +1,8 @@
 #include "gqa.h"
 
 void gqattention(
-    float *x_in, LFM2Config *config, 
-    GQAWeights *gqa_weights, 
-    Buf *buf, int BATCH, int seq_len
+    float *x_in, LFM2Config *config, GQAWeights *gqa_weights, Buf *buf, 
+    CBuf *cache_buf, int BATCH, int seq_len, int decode_start, int l_idx
 ) {
     int d_model = config->d_model,
         heads = config->heads,
@@ -27,12 +26,14 @@ void gqattention(
     compute_rms_norm(buf->q_t, gqa_weights->q_norm, seq_len * d_out, head_dim);
     compute_rms_norm(buf->k_t, gqa_weights->k_norm, seq_len * kv_d_out, head_dim);
     apply_rope(buf->q_t, buf->k_t, buf->cos, buf->sin, seq_len, heads, kv_groups, head_dim);
+    update_cache(
+        cache_buf, config, buf->k_t, buf->v_t, 
+        seq_len, decode_start, l_idx
+    );
     int kv_size = BATCH * seq_len * kv_groups * head_dim;
     repeat_interleave(buf->k_t, kv_size, buf->k_expand, seq_len * head_dim, group_size);
     repeat_interleave(buf->v_t, kv_size, buf->v_expand, seq_len * head_dim, group_size);
-    sdpattention(
-    buf->q_t, buf->k_expand, buf->v_expand, buf, head_dim,
-    BATCH, seq_len, heads, head_dim);
+    sdpattention(buf, BATCH, seq_len, heads, head_dim);
     transpose_middle(BATCH, heads, seq_len, head_dim, buf->attn_out, buf->attn_out_t);
     matmul(buf->attn_out_t, gqa_weights->wo, buf->x_out, BATCH, seq_len, d_model, d_out);
 }

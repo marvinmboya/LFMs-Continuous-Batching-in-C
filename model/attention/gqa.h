@@ -6,10 +6,11 @@
 #include "../types.h"
 #include "utils.h"
 #include "../rope.h"
-
+#include "../../cache/init_cache.h"
 #include <float.h>
 
 void gqattention(
-    float *x_in, LFM2Config *config, GQAWeights *gqa_weights, Buf *buffers, int BATCH, int seq_len
+    float *x_in, LFM2Config *config, GQAWeights *gqa_weights, Buf *buf, 
+    CBuf *cache_buf, int BATCH, int seq_len, int decode_start, int l_idx
 );
 #endif
