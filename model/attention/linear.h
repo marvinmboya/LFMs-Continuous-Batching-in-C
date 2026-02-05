@@ -19,7 +19,7 @@
 #endif
 
 void matmul_higher(
-    const float *A, const float *B, float *C, int batch, int heads, int seq_len, int head_dim);
+    const float *A, const float *B, float *C, int batch, int heads, int q_seq_len, int k_seq_len, int head_dim);
 void matmul_implicit_transpose(
-    const float *Q, const float *K, float *QKT, int batch, int heads, int seq_len, int head_dim);
+    const float *Q, const float *K, float *QKT, int batch, int heads, int q_seq_len, int k_seq_len, int head_dim);
 #endif
