@@ -2,16 +2,19 @@
 #include <time.h>
 
 void LFM2Model(
-    Weights *weights, Buf *buf, LFM2Config *config, 
-    int *token_ids, int seq_len, int batch
+    Weights *weights, Buf *buf, CBuf *cache_buf, 
+    LFM2Config *config, int *token_ids, int seq_len, int batch
 ) {
+    int decode_start = get_seq_len();
+    int decode_end = decode_start + seq_len;
+    printf("start: %d end: %d\n", decode_start, decode_end);
     compute_embeds(weights->embeds, buf->embeds_out, token_ids, seq_len, config->d_model);
     float *in = buf->embeds_out;
     float *out = buf->x_out;
     for (int i = 0; i < 16; i++) {
         backbone(
-            in, config, weights, buf,
-            batch, seq_len, config->d_model, config->k_size, i
+            in, config, weights, buf, cache_buf, batch, 
+            seq_len, decode_start, config->d_model, config->k_size, i
         );
         in = out; 
     }
