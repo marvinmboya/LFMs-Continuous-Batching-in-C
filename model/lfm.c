@@ -6,8 +6,6 @@ void LFM2Model(
     LFM2Config *config, int *token_ids, int seq_len, int batch
 ) {
     int decode_start = get_seq_len();
-    int decode_end = decode_start + seq_len;
-    printf("start: %d end: %d\n", decode_start, decode_end);
     compute_embeds(weights->embeds, buf->embeds_out, token_ids, seq_len, config->d_model);
     float *in = buf->embeds_out;
     float *out = buf->x_out;
