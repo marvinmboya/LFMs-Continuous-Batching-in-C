@@ -36,8 +36,7 @@ void update_cache(
     const float *v, int seq_len, int decode_start, int i
 ) {
     size_t sz = seq_len * config->kv_groups * config->head_dim;
-    int offset = (decode_start - 1) * sz;
-    if (offset < 0) offset = 0;
+    int offset = decode_start * sz;
     memcpy(bufs->k_cache[i] + offset, k, sz * sizeof(float));
     memcpy(bufs->v_cache[i] + offset, v, sz * sizeof(float));
     cache_seq_len = decode_start + seq_len;
