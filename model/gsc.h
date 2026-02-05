@@ -4,6 +4,7 @@
 #include <omp.h>
 #include "attention/linear.h"
 #include "attention/utils.h"
+#include "../cache/init_cache.h"
 #include "types.h"
 #include <math.h>
 
@@ -18,8 +19,8 @@ float* input, float* output, int channels,
 int seq_len_in, int seq_len_out);
 
 void gscblock(
-    float *x_in, GSCWeights *gsc_weights, 
-    Buf *buffers, int BATCH, int seq_len, int d_model, int k_size
+    float *x_in, GSCWeights *gsc_weights, Buf *buf, CBuf *cache_buf, int BATCH, 
+    int seq_len, int decode_start, int l_idx, int d_model, int k_size
 );
 
 #endif

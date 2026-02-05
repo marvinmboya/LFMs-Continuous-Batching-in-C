@@ -1,8 +1,8 @@
 #include "gsc.h"
 
 void gscblock(
-    float *x_in, GSCWeights *gsc_w, Buf *buf,
-    int BATCH, int seq_len, int d_model, int k_size
+    float *x_in, GSCWeights *gsc_w, Buf *buf, CBuf *cache_buf, int BATCH, 
+    int seq_len, int decode_start, int l_idx, int d_model, int k_size
 ){
     matmul(x_in, gsc_w->w1, buf->BCx, BATCH, seq_len, d_model, d_model * 3);
     transpose_last(BATCH, seq_len, d_model * 3, buf->BCx, buf->BCx_t );
