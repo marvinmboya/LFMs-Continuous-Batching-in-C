@@ -25,15 +25,27 @@ void gqattention(
     transpose_middle(batch, seq_len, kv_groups, head_dim, buf->v, buf->v_t);
     compute_rms_norm(buf->q_t, gqa_weights->q_norm, seq_len * d_out, head_dim);
     compute_rms_norm(buf->k_t, gqa_weights->k_norm, seq_len * kv_d_out, head_dim);
-    apply_rope(buf->q_t, buf->k_t, buf->cos, buf->sin, seq_len, heads, kv_groups, head_dim);
+    apply_rope(
+        buf->q_t, buf->k_t, buf->cos, buf->sin, seq_len, 
+        decode_start, heads, kv_groups, head_dim
+    );
     update_cache(
         cache_buf, config, buf->k_t, buf->v_t, 
-        seq_len, decode_start, l_idx
+        batch, seq_len, decode_start, l_idx
     );
-    int kv_size = batch * seq_len * kv_groups * head_dim;
-    repeat_interleave(buf->k_t, kv_size, buf->k_expand, seq_len * head_dim, group_size);
-    repeat_interleave(buf->v_t, kv_size, buf->v_expand, seq_len * head_dim, group_size);
-    sdpattention(buf, batch, seq_len, heads, head_dim);
+    int interim_seq_len = decode_start + seq_len;
+    int kv_size = batch * interim_seq_len * kv_groups * head_dim;
+    repeat_interleave(
+        cache_buf->k_cache[l_idx], kv_size, 
+        buf->k_expand, 
+        interim_seq_len * head_dim, group_size
+    );
+    repeat_interleave(
+        cache_buf->v_cache[l_idx], kv_size, 
+        buf->v_expand, 
+        interim_seq_len * head_dim, group_size
+    );
+    sdpattention(buf, batch, seq_len, decode_start, heads, head_dim);
     transpose_middle(batch, heads, seq_len, head_dim, buf->attn_out, buf->attn_out_t);
     matmul(buf->attn_out_t, gqa_weights->wo, buf->x_out, batch, seq_len, d_model, d_out);
 }
