@@ -5,7 +5,7 @@ void matmul(
     const float *x_in,  // B*M*K
     const float *weights,  // K*N
     float *x_out,        // B*M*N
-    int BATCH, int M, int K, int N) {
+    int batch, int M, int K, int N) {
     /* 
     multiply 3D by 2D indexed flattened tensors,
     that is:
@@ -15,7 +15,7 @@ void matmul(
     (Batch, Heads, (KV)Dout) 
     */
     #pragma omp parallel for collapse(3)
-    for (int b = 0; b < BATCH; ++b) {
+    for (int b = 0; b < batch; ++b) {
         for (int i = 0; i < M; ++i) {
             for (int j = 0; j < N; ++j) {
                 float sum = 0.0f;
@@ -35,7 +35,7 @@ void matmul_higher(
     const float *A,   // [B, H, M, K]
     const float *B,// [B, H, K, N]
     float *C,         // [B, H, M, N]
-    int BATCH,
+    int batch,
     int HEADS,
     int M,
     int N
@@ -50,7 +50,7 @@ void matmul_higher(
     (Batch, Heads, SeqLen, HeadDim) 
     */
     #pragma omp parallel for collapse(4)
-    for (int b = 0; b < BATCH; ++b) {
+    for (int b = 0; b < batch; ++b) {
         for (int h = 0; h < HEADS; ++h) {
             for (int i = 0; i < M; ++i) {
                 for (int j = 0; j < N; ++j) {

@@ -2,11 +2,11 @@
 #include <stdio.h>
 
 void transpose_middle(
-    int BATCH, int seq_len, int heads, int head_dim, 
+    int batch, int seq_len, int heads, int head_dim, 
     const float *old, float *new) {
     int C = seq_len, H = heads, W = head_dim;
     #pragma omp parallel for collapse(2)
-    for (int n = 0; n < BATCH; n++) {
+    for (int n = 0; n < batch; n++) {
         for (int h = 0; h < H; h++) {
             for (int c = 0; c < C; c++) {
                 int dst_base = n*(H*C*W) + h*(C*W) + c*W;
@@ -21,12 +21,12 @@ void transpose_middle(
 }
 
 void transpose_last_higher(
-    int BATCH, int seq_len, int heads, int head_dim,
+    int batch, int seq_len, int heads, int head_dim,
     const float *old, float *new)
 {
     int C = seq_len, H = heads, W = head_dim;
     #pragma omp parallel for collapse(2)
-    for (int n = 0; n < BATCH; n++) {
+    for (int n = 0; n < batch; n++) {
         for (int c = 0; c < C; c++) {
             for (int h = 0; h < H; h++) {
                 for (int w = 0; w < W; w++) {
@@ -40,14 +40,14 @@ void transpose_last_higher(
 }
 
 void transpose_last(
-    int BATCH, int seq_len, int dims,
+    int batch, int seq_len, int dims,
     const float *old, float *new)
 {
     int C = seq_len;
     int W = dims;
 
     #pragma omp parallel for collapse(2)
-    for (int n = 0; n < BATCH; n++) {
+    for (int n = 0; n < batch; n++) {
         for (int c = 0; c < C; c++) {
             for (int w = 0; w < W; w++) {
                 int src = n*(C*W) + c*(W) + w;

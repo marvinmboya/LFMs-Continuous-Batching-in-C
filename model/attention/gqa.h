@@ -11,6 +11,6 @@
 
 void gqattention(
     float *x_in, LFM2Config *config, GQAWeights *gqa_weights, Buf *buf, 
-    CBuf *cache_buf, int BATCH, int seq_len, int decode_start, int l_idx
+    CBuf *cache_buf, int batch, int seq_len, int decode_start, int l_idx
 );
 #endif
