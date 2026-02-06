@@ -44,11 +44,12 @@ int main() {
         config.max_seq_len, config.head_dim, 
         config.theta_base);
     struct timespec start, end;
-    clock_gettime(CLOCK_MONOTONIC, &start);
     char *decoded;
-    int max_new_tokens = 500;
-    int total_decoded = 0;
+    int max_new_tokens = 1000;
+    int total_decoded = 0; 
+    float avg_seconds_per_token = 0.0f;
     while (total_decoded < max_new_tokens) {
+        clock_gettime(CLOCK_MONOTONIC, &start);
         LFM2Model(&model_weights, &model_buffers, &cache_buffers, &config, token_ids, seq_len, batch);
         int next_token = decode_next_token(&model_buffers, seq_len, config.n_vocab);
         if (next_token == config.eos_token_id) break;
@@ -58,13 +59,18 @@ int main() {
         int next_arr[] = {next_token};
         token_ids = next_arr;
         seq_len = 1;
-        total_decoded += 1;
-    } 
-    printf("\n");
-    clock_gettime(CLOCK_MONOTONIC, &end);
-    double elapsed = (end.tv_sec - start.tv_sec) +
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        double elapsed = (end.tv_sec - start.tv_sec) +
                     (end.tv_nsec - start.tv_nsec) / 1e9;
-    printf("Elapsed time: %f seconds\n", elapsed);
+        if (total_decoded > 0) {
+            avg_seconds_per_token = 1/(double)total_decoded * (
+            ((total_decoded - 1) * avg_seconds_per_token) + elapsed
+        );
+        }
+        total_decoded += 1;
+    }
+    printf("\n");
+    printf("Decode: %.3f Tokens/Second\n", 1.0 / avg_seconds_per_token);
     destroy_cache_buffers(&cache_buffers);
     destroy_weights(&model_weights);
     free(decoded);
