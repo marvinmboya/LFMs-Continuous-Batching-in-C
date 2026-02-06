@@ -18,8 +18,9 @@ LDLIBS := $(LDLIBS) -lm
 
 INCLUDES := -Imodel -Itokenizer
 
+PROMPT ?= What is hello in Spanish?
 run: ${BIN}
-	${BIN}
+	${BIN} "${PROMPT}"
 
 ${BIN}: ${SRCS} ${HDRS}
 	${COMPILER} ${FLAGS} ${ARMSRCS} ${INCLUDES} ${SRCS} -o ${BIN} ${LDLIBS}
