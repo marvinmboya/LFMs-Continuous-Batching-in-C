@@ -18,6 +18,8 @@
 void test_encode_decode(Tokenizer *tok);
 
 int main(int argc, char **argv) {
+    char prompt[200];
+    snprintf(prompt, sizeof(prompt), "%s", argv[1]);
     LFM2Config config = {
         .n_vocab = 65536, .d_model = 1024, .d_hidden = 4608,
         .max_seq_len = 2000, .n_layers = 16, .heads = 16, 
@@ -34,7 +36,8 @@ int main(int argc, char **argv) {
     create_weights(&config, &model_weights);
 
     Tokenizer *tok = init_tok_special_toks(tok_path);
-    const char *text = "<|startoftext|><|im_start|>user\nWhat is hello in spanish?<|im_end|>\n<|im_start|>assistant\n";
+    char text[300];
+    snprintf(text, sizeof(text), "<|startoftext|><|im_start|>user\n%s<|im_end|>\n<|im_start|>assistant\n", prompt);
     int seq_len;
     int *token_ids = encode(tok, text, &seq_len);
     create_model_buffers(&model_buffers, &config, batch, seq_len);
@@ -48,6 +51,7 @@ int main(int argc, char **argv) {
     int max_new_tokens = 1000;
     int total_decoded = 0; 
     float avg_seconds_per_token = 0.0f;
+    int next_arr[1];
     while (total_decoded < max_new_tokens) {
         clock_gettime(CLOCK_MONOTONIC, &start);
         LFM2Model(&model_weights, &model_buffers, &cache_buffers, &config, token_ids, seq_len, batch);
@@ -56,12 +60,8 @@ int main(int argc, char **argv) {
         decoded = decode(tok, &next_token, 1);
         printf("%s", decoded);
         fflush(stdout);
-        int next_arr[] = {next_token};
-        if (total_decoded == 0) {
-            free(token_ids);
-        }
-        token_ids = next_arr;
-        seq_len = 1;
+        next_arr[0] = next_token;
+        token_ids = next_arr; seq_len = 1;
         clock_gettime(CLOCK_MONOTONIC, &end);
         double elapsed = (end.tv_sec - start.tv_sec) +
                     (end.tv_nsec - start.tv_nsec) / 1e9;
