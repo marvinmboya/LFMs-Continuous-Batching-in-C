@@ -9,6 +9,7 @@ typedef struct {
     float **conv_state;
     float **k_cache;
     float **v_cache;
+    int *cache_seq_len;
 } CBuf;
 
 void create_cache_buffers(CBuf *bufs, LFM2Config config, int batch);
