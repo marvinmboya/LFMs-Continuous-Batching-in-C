@@ -1,4 +1,4 @@
-#include "lfm.h" 
+#include "model/lfm.h" 
 // also can use <lfm.h>
 #include "bpe.h"
 #include "model/types.h"
@@ -12,43 +12,59 @@
 #include "model/init_buffers.h"
 #include <time.h>
 #include "engine/decode.h"
+#include "model/rope.h"
+#include "cache/init_cache.h"
 
 void test_encode_decode(Tokenizer *tok);
 
 int main() {
     LFM2Config config = {
         .n_vocab = 65536, .d_model = 1024, .d_hidden = 4608,
-        .context_len = 32000, .n_layers = 16, .heads = 16, 
-        .head_dim = 64, .kv_groups = 8, .k_size = 3
+        .max_seq_len = 2000, .n_layers = 16, .heads = 16, 
+        .head_dim = 64, .kv_groups = 8, .k_size = 3,
+        .theta_base = 1000000.0f, .eos_token_id = 7
     };
     Weights model_weights;
     Buf model_buffers;
+    CBuf cache_buffers;
 
+    int batch = 1;
     char *tok_path = "files/tokenizer.bin";
     char *embed_path = "files/embed_data.bin";
     omp_set_num_threads(get_suff_threads());
     create_weights(&config, &model_weights);
 
-    int batch = 1;
     Tokenizer *tok = init_tok_special_toks(tok_path);
-    // const char *text = "Hello world!";
     const char *text = "<|startoftext|><|im_start|>user\nWhat is hello in spanish?<|im_end|>\n<|im_start|>assistant\n";
     int seq_len;
     int *token_ids = encode(tok, text, &seq_len);
     create_model_buffers(&model_buffers, &config, batch, seq_len);
+    create_cache_buffers(&cache_buffers, config, batch);
+    compute_rope(
+        model_buffers.cos, model_buffers.sin, 
+        config.max_seq_len, config.head_dim, 
+        config.theta_base);
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
-    LFM2Model(&model_weights, &model_buffers, &config, token_ids, seq_len, batch);
-    int next_token = decode_next_token(&model_buffers, seq_len, config.n_vocab);
-    char *decoded = decode(tok, &next_token, 1);
-    printf("%s\n", decoded);
+    char *decoded;
+    for (int m = 0; m < 15; m++) {
+        LFM2Model(&model_weights, &model_buffers, &cache_buffers, &config, token_ids, seq_len, batch);
+        int next_token = decode_next_token(&model_buffers, seq_len, config.n_vocab);
+        if (next_token == config.eos_token_id) break;
+        decoded = decode(tok, &next_token, 1);
+        printf("%s", decoded);
+        int next_arr[] = {next_token};
+        token_ids = next_arr;
+        seq_len = 1;
+    }
+    printf("\n");
     clock_gettime(CLOCK_MONOTONIC, &end);
     double elapsed = (end.tv_sec - start.tv_sec) +
                     (end.tv_nsec - start.tv_nsec) / 1e9;
     printf("Elapsed time: %f seconds\n", elapsed);
+    destroy_cache_buffers(&cache_buffers);
     destroy_weights(&model_weights);
     free(decoded);
-    free(token_ids);
     free(tok);
     return 0;
 }
