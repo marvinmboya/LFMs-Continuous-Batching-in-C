@@ -18,5 +18,4 @@ void update_cache(
     const float *v, int start, int batch, int seq_len, int idx
 );
 void destroy_cache_buffers(CBuf *bufs);
-int get_seq_len();
 #endif
