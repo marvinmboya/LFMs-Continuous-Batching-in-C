@@ -14,6 +14,7 @@ typedef struct {
     int kv_groups;
     int k_size;
     float theta_base;
+    int eos_token_id;
 } LFM2Config;
 
 typedef struct {
