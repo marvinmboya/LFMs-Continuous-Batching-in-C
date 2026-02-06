@@ -30,7 +30,6 @@ int main() {
 
     int batch = 1;
     char *tok_path = "files/tokenizer.bin";
-    char *embed_path = "files/embed_data.bin";
     omp_set_num_threads(get_suff_threads());
     create_weights(&config, &model_weights);
 
@@ -47,16 +46,20 @@ int main() {
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
     char *decoded;
-    for (int m = 0; m < 15; m++) {
+    int max_new_tokens = 500;
+    int total_decoded = 0;
+    while (total_decoded < max_new_tokens) {
         LFM2Model(&model_weights, &model_buffers, &cache_buffers, &config, token_ids, seq_len, batch);
         int next_token = decode_next_token(&model_buffers, seq_len, config.n_vocab);
         if (next_token == config.eos_token_id) break;
         decoded = decode(tok, &next_token, 1);
         printf("%s", decoded);
+        fflush(stdout);
         int next_arr[] = {next_token};
         token_ids = next_arr;
         seq_len = 1;
-    }
+        total_decoded += 1;
+    } 
     printf("\n");
     clock_gettime(CLOCK_MONOTONIC, &end);
     double elapsed = (end.tv_sec - start.tv_sec) +
