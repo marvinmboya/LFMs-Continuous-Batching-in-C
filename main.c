@@ -1,5 +1,4 @@
-#include "model/lfm.h" 
-// also can use <lfm.h>
+#include "model/lfm.h"
 #include "bpe.h"
 #include "model/types.h"
 #include "model/embed.h"
@@ -14,8 +13,6 @@
 #include "engine/decode.h"
 #include "model/rope.h"
 #include "cache/init_cache.h"
-
-void test_encode_decode(Tokenizer *tok);
 
 int main(int argc, char **argv) {
     char prompt[200];
@@ -79,15 +76,4 @@ int main(int argc, char **argv) {
     free(decoded);
     free(tok);
     return 0;
-}
-
-void test_encode_decode(Tokenizer *tok){
-    const char *text = "Hello world!";
-    int len;
-    int *tokens = encode(tok, text, &len);
-    for (int i = 0; i < len; i++) printf("%d ", tokens[i]);
-    printf("\n");
-    char *decoded = decode(tok, tokens, len);
-    printf("%s\n", decoded);
-    free(decoded); free(tokens);
 }
