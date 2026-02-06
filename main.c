@@ -17,7 +17,7 @@
 
 void test_encode_decode(Tokenizer *tok);
 
-int main() {
+int main(int argc, char **argv) {
     LFM2Config config = {
         .n_vocab = 65536, .d_model = 1024, .d_hidden = 4608,
         .max_seq_len = 2000, .n_layers = 16, .heads = 16, 
@@ -57,6 +57,9 @@ int main() {
         printf("%s", decoded);
         fflush(stdout);
         int next_arr[] = {next_token};
+        if (total_decoded == 0) {
+            free(token_ids);
+        }
         token_ids = next_arr;
         seq_len = 1;
         clock_gettime(CLOCK_MONOTONIC, &end);
