@@ -14,16 +14,22 @@ ifeq (${SHELL_U}, Darwin)
 	FLAGS := $(FLAGS) -mcpu=native -L$(ARMPL)/lib -Wl,-rpath,$(ARMPL)/lib
 	LDLIBS := -larmpl_lp64_mp -lamath
 endif
+
+DFLAG ?=
+ifeq (${DBG}, True)
+	DFLAG := -fsanitize=address -g -O0 
+endif 
+
 LDLIBS := $(LDLIBS) -lm
 
 INCLUDES := -Imodel -Itokenizer
 
-PROMPT ?= What is hello in Spanish?
+PROMPT ?= What is hello in Spanish
 run: ${BIN}
 	${BIN} "${PROMPT}"
 
 ${BIN}: ${SRCS} ${HDRS}
-	${COMPILER} ${FLAGS} ${ARMSRCS} ${INCLUDES} ${SRCS} -o ${BIN} ${LDLIBS}
+	${COMPILER} ${DFLAG} ${FLAGS} ${ARMSRCS} ${INCLUDES} ${SRCS} -o ${BIN} ${LDLIBS}
 
 clean:
 	rm ${BIN}
