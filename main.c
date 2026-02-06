@@ -15,6 +15,10 @@
 #include "cache/init_cache.h"
 
 int main(int argc, char **argv) {
+    if (argc < 2){
+        printf("pass prompt arg!");
+        exit(0);
+    }
     char prompt[200];
     snprintf(prompt, sizeof(prompt), "%s", argv[1]);
     LFM2Config config = {
