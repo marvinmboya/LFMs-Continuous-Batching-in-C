@@ -9,6 +9,7 @@ void compute_rope(
 );
 void apply_rope(
     float *q, float *k, const float *cos, const float *sin,
-    int seq_len, int decode_start, int num_q_heads, int num_kv_heads, int head_dim
+    int batch, int seq_len, int decode_start, 
+    int num_q_heads, int num_kv_heads, int head_dim
 );
 #endif
