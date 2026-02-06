@@ -26,8 +26,8 @@ void gqattention(
     compute_rms_norm(buf->q_t, gqa_weights->q_norm, seq_len * d_out, head_dim);
     compute_rms_norm(buf->k_t, gqa_weights->k_norm, seq_len * kv_d_out, head_dim);
     apply_rope(
-        buf->q_t, buf->k_t, buf->cos, buf->sin, seq_len, 
-        decode_start, heads, kv_groups, head_dim
+        buf->q_t, buf->k_t, buf->cos, buf->sin, batch, 
+        seq_len, decode_start, heads, kv_groups, head_dim
     );
     update_cache(
         cache_buf, config, buf->k_t, buf->v_t, 
