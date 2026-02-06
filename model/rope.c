@@ -23,42 +23,53 @@ void apply_rope(
 ) {
     int half_dim = head_dim / 2;
     int decode_end = decode_start + seq_len;
+    
     /* Apply RoPE to Q */
-    for (int s = decode_start; s < decode_end; s++) {
-        const float *cos_row = cos + s * half_dim;
-        const float *sin_row = sin + s * half_dim;
-
+    for (int b = 0; b < batch; b++) {
         for (int h = 0; h < num_q_heads; h++) {
-            float *q_head = q + s * num_q_heads * head_dim + h * head_dim;
+            for (int s = 0; s < seq_len; s++) {
+                int pos = decode_start + s;
+                const float *cos_row = cos + pos * half_dim;
+                const float *sin_row = sin + pos * half_dim;
+                
+                float *q_head = q + (b * num_q_heads * seq_len * head_dim) +
+                                    (h * seq_len * head_dim) +
+                                    (s * head_dim);
 
-            for (int i = 0; i < half_dim; i++) {
-                float x0 = q_head[i];
-                float x1 = q_head[i + half_dim];
-                float cos_val = cos_row[i];
-                float sin_val = sin_row[i];
+                for (int i = 0; i < half_dim; i++) {
+                    float x0 = q_head[i];
+                    float x1 = q_head[i + half_dim];
+                    float cos_val = cos_row[i];
+                    float sin_val = sin_row[i];
 
-                q_head[i] = x0 * cos_val - x1 * sin_val;
-                q_head[i + half_dim] = x0 * sin_val + x1 * cos_val;
+                    q_head[i] = x0 * cos_val - x1 * sin_val;
+                    q_head[i + half_dim] = x0 * sin_val + x1 * cos_val;
+                }
             }
         }
     }
 
     /* Apply RoPE to K */
-    for (int s = decode_start; s < decode_end; s++) {
-        const float *cos_row = cos + s * half_dim;
-        const float *sin_row = sin + s * half_dim;
-
+    for (int b = 0; b < batch; b++) {
         for (int h = 0; h < num_kv_heads; h++) {
-            float *k_head = k + s * num_kv_heads * head_dim + h * head_dim;
+            for (int s = 0; s < seq_len; s++) {
+                int pos = decode_start + s;
+                const float *cos_row = cos + pos * half_dim;
+                const float *sin_row = sin + pos * half_dim;
+                
+                float *k_head = k + (b * num_kv_heads * seq_len * head_dim) +
+                                    (h * seq_len * head_dim) +
+                                    (s * head_dim);
 
-            for (int i = 0; i < half_dim; i++) {
-                float x0 = k_head[i];
-                float x1 = k_head[i + half_dim];
-                float cos_val = cos_row[i];
-                float sin_val = sin_row[i];
+                for (int i = 0; i < half_dim; i++) {
+                    float x0 = k_head[i];
+                    float x1 = k_head[i + half_dim];
+                    float cos_val = cos_row[i];
+                    float sin_val = sin_row[i];
 
-                k_head[i] = x0 * cos_val - x1 * sin_val;
-                k_head[i + half_dim] = x0 * sin_val + x1 * cos_val;
+                    k_head[i] = x0 * cos_val - x1 * sin_val;
+                    k_head[i + half_dim] = x0 * sin_val + x1 * cos_val;
+                }
             }
         }
     }
