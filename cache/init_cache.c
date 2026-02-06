@@ -40,7 +40,11 @@ void update_cache(
     
     int current_len = bufs->cache_seq_len[l_idx];
     int new_len = current_len + seq_len;
-    
+    if (new_len > config->max_seq_len) {
+        fprintf(stderr, "Cache overflow! current=%d, adding=%d, max=%d\n",
+                new_len, seq_len, config->max_seq_len);
+        abort();
+    }
     // Size per cache: B * H * total_seq * HD (compact, no gaps)
     size_t old_size = batch * kv_groups * current_len * head_dim;
     size_t new_size = batch * kv_groups * new_len * head_dim;
