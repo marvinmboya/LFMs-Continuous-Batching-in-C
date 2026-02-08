@@ -4,6 +4,13 @@
 
 #if defined(__arm__) || defined(__aarch64__)
     #include <armpl.h>
+#elif defined(__x86_64__) || defined(_M_X64)
+    #include <mkl.h>
+#endif
+
+#if defined(__arm__) || defined(__aarch64__) || \
+    defined(__x86_64__) || defined(_M_X64)
+
     static inline void matmul(const float *a, const float *b, float *c, 
                              int batch, int M, int K, int N) {
         cblas_sgemm(
