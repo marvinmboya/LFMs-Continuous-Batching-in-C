@@ -1,6 +1,7 @@
 #include "linear.h"
 
-#if !defined(__arm__) && !defined(__aarch64__)
+#if !defined(__arm__) && !defined(__aarch64__) && \
+    !defined(__x86_64__) && !defined(_M_X64)
 void matmul(
     const float *x_in,  // B*M*K
     const float *weights,  // K*N
