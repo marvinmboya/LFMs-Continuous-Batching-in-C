@@ -74,3 +74,12 @@ void max_elements(float *array, size_t N) {
     }
     printf("INDEX: %d VAL: %f\n", max_index, max_value);
 }
+
+void tokenprint(char *s){
+    printf("\x1B[38;5;216;1m%s\x1B[0m", s);
+    fflush(stdout);
+}
+
+void tpsprint(float tps){
+    printf("\n\x1B[0;33mDecode: [%.3f Tokens/Second]\x1B[0m\n", tps);
+}
