@@ -23,14 +23,13 @@ All components built from scratch using pure C:
 Download generated FP32 weights and Tokenizer .bin files as a zipped file from Google Drive link:<br/>
 [Weights & Tokenizer File.](https://drive.google.com/file/d/1EF5ES19B1ch_PS2B_kjup8HR-DYAzikf/view?usp=sharing)
 
-Alternatively:<br/> 
-- Download official weights and tokenizer from LFM2-350M Hugging Face's 🤗 [repository](https://huggingface.co/LiquidAI/LFM2-350M). 
+Alternatively:<br/>  
 - Git clone Batched Inference Engine repo for LFM2-350M (built from scratch in Pytorch). 
 - Git pull ``store-c-bin-extras`` branch then run:
 ```sh
 python model_tok_to_bin.py
 ```
-to generate FP32 weights and Tokenizer .bin files. Finally, move files dir to the root dir for this repo.
+To download official weights and tokenizer from LFM2-350M Hugging Face's 🤗 [repository](https://huggingface.co/LiquidAI/LFM2-350M), and generate FP32 weights and Tokenizer .bin files. Finally, move files dir to the root dir for this repo.
  ### Tools SetUp
 OpenMP (multithreading package) is automatically setup for gcc upgraded to v15. However, clang needs separate OpenMP setup and isn't bundled by default.<br/>
 Brew installs [OpenMP](https://formulae.brew.sh/formula/libomp) via
