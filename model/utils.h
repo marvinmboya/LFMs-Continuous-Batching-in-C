@@ -22,4 +22,6 @@ size_t get_file_size_v2(FILE *f);
 void load_map_data(const char *weights_path, Weights_Meta *meta, size_t n);
 void debug_print_first_five(float *embed_out, int seq_len, int d_model);
 void max_elements(float *array, size_t N);
+void tokenprint(char *s);
+void tpsprint(float tps);
 #endif
