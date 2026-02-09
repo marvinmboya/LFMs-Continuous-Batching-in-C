@@ -59,8 +59,7 @@ int main(int argc, char **argv) {
         int next_token = decode_next_token(&model_buffers, seq_len, config.n_vocab);
         if (next_token == config.eos_token_id) break;
         decoded = decode(tok, &next_token, 1);
-        printf("%s", decoded);
-        fflush(stdout);
+        tokenprint(decoded);
         next_arr[0] = next_token;
         token_ids = next_arr; seq_len = 1;
         clock_gettime(CLOCK_MONOTONIC, &end);
@@ -74,7 +73,7 @@ int main(int argc, char **argv) {
         total_decoded += 1;
     }
     printf("\n");
-    printf("Decode: %.3f Tokens/Second\n", 1.0 / avg_seconds_per_token);
+    tpsprint(1.0 / avg_seconds_per_token);
     destroy_cache_buffers(&cache_buffers);
     destroy_weights(&model_weights);
     free(decoded);
