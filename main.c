@@ -1,12 +1,7 @@
 #include "model/lfm.h"
 #include "bpe.h"
 #include "model/types.h"
-#include "model/embed.h"
-#include "model/rmsnorm.h"
 #include "model/utils.h"
-#include "model/attention/utils.h"
-#include "model/attention/gqa.h"
-#include "model/gsc.h"
 #include "model/init_weights.h"
 #include "model/init_buffers.h"
 #include <time.h>
