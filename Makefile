@@ -31,7 +31,7 @@ endif
 
 INCLUDES := -Imodel -Itokenizer
 
-PROMPT ?= What is hello in Spanish
+PROMPT ?= What is hello in Spanish?
 run: ${BIN}
 	${BIN} "${PROMPT}"
 
